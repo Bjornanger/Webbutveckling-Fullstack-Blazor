@@ -18,4 +18,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\webbutveckling-labb2-Bjornanger.Shared\webbutveckling-labb2-Bjornanger.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

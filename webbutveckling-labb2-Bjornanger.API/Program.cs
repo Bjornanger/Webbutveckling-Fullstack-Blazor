@@ -1,24 +1,34 @@
 using BlazorLABB.Client.Extensions;
+using DataAccess;
+using DataAccess.Entities;
 using DataAccess.Repository;
+using Microsoft.EntityFrameworkCore;
+using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddSingleton<ProductRepository>();//TODO ändra dess till Scooped
-builder.Services.AddSingleton<CustomerRepository>();//TODO ändra dess till Scooped
-builder.Services.AddSingleton<CategoryRepository>();//TODO ändra dess till Scooped
+var connectionString = builder.Configuration.GetConnectionString("WebLabbGroceryStoreDB");
+
+builder.Services.AddDbContext<GroceryStoreDbContext>(
+    options => options.UseSqlServer(connectionString)
+    );
 
 
-
+builder.Services.AddScoped<IAdminService<Admin>, AdminRepository>();
+builder.Services.AddScoped<ICategoryService<Category>, CategoryRepository>();
+builder.Services.AddScoped<ICustomerService<Customer>, CustomerRepository>();
+builder.Services.AddScoped<IOrderService<Order>, OrderRepository>();
+builder.Services.AddScoped<IProductService<Product>, ProductRepository>();
 
 
 
 var app = builder.Build();
 
 
+
 app.MapProductEndpointExtensions();
 app.MapCategoryEndpoints();
-
 
 app.MapCustomerInteractionEndpoints();
 app.MapUserEndpointExtensions();

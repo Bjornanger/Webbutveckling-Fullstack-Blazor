@@ -1,6 +1,7 @@
 ﻿using DataAccess.Entities;
 using DataAccess.Repository;
 using Microsoft.AspNetCore.Http.HttpResults;
+using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 namespace BlazorLABB.Client.Extensions;
 
@@ -27,9 +28,18 @@ public static class UserEndpointExtensions
 
     }
 
-    private static void DeleteCustomer(CustomerRepository service, int userId)
+    //private static async Task GetAllAdmins(HttpContext context)
+    //{
+
+    //}
+    //private static async void AddNewAdmin(IAdminService<Admin> newAdmin)
+    //{
+
+    //}
+
+    private static async void DeleteCustomer(ICustomerService<Customer> customerRepo, int userId)
     {
-        var userToRemove = service.Customers.FirstOrDefault(u => u.Id == userId);
+        var userToRemove = await customerRepo.GetByIdAsync(userId);
         if (userToRemove is null)
         {
             Results.BadRequest($"User with {userId}  not found");
@@ -37,47 +47,48 @@ public static class UserEndpointExtensions
         }
 
         Results.Ok($"User: {userToRemove.Id} {userToRemove.FirstName} found and Removed.");
-        service.Customers.Remove(userToRemove);
-        //context.SaveChanges();
+        await customerRepo.DeleteAsync(userToRemove.Id);
+        
+
+    }
+
+   
+
+    private static async void AddNewCustomer(ICustomerService<Customer> customerRepo, Customer newCustomer)
+    {
+        var customerToAdd = await customerRepo.GetAllAsync();
+
+
+        if (customerToAdd.ToList().Any(p => p.Id == newCustomer.Id))
+        {
+            Results.BadRequest($"The Customer with this Email: {newCustomer.Id} already exists");
+            return;
+        }
+        Results.Ok();
+        customerRepo.AddAsync(newCustomer);
         
     }
 
-    //private static void AddNewAdmin(CustomerService service, Admin admin)
-    //{
-       
-    //}
-
-    private static void AddNewCustomer(CustomerRepository service, Customer customer)
+    private static async Task<Customer> GetUserByEmail(ICustomerService<Customer> customerRepo, string email)
     {
-        if (service.Customers.Any(p => p.Email == customer.Email))
-        {
-            Results.BadRequest($"The Customer with this Email: {customer.Email} already exists");
-            return;
-        }
+        var allCustomers = await customerRepo.GetAllAsync();
 
-        Results.Ok();
-        service.Customers.Add(customer);
-        //context.SaveChanges();
+        var customerEmail = allCustomers.FirstOrDefault(c => c.Email.Equals(email));
 
-    }
-
-    private static Customer GetUserByEmail(CustomerRepository service, string email)
-    {
-        var customerEmail = service.Customers.Find(c => c.Email == email);
         if (customerEmail is null)
         {
-            Results.BadRequest("Email not Found");
-            return null;
+            Results.NotFound($"Customer with {customerEmail}does not exist");
         }
 
         Results.Ok("Email found");
         return customerEmail;
     }
 
-    private static Customer GetUserById(CustomerRepository service, int userId)
+    private static async Task<Customer> GetUserById(ICustomerService<Customer> customerRepo, int userId)
     {
-        var userById = service.Customers.FirstOrDefault(i => i.Id == userId);
-
+        var userById = await  customerRepo.GetByIdAsync(userId);
+        
+        
         if (userById is null)
         {
             Results.BadRequest("User not found");
@@ -86,17 +97,11 @@ public static class UserEndpointExtensions
 
         Results.Ok();
         return userById;
-
     }
-
-    //private static Task GetAllAdmins(HttpContext context)
-    //{
-    //    throw new NotImplementedException();
-    //}
-
-    private static List<Customer> GetAllCustomers(CustomerRepository service)
+    
+    private static async Task<List<Customer>> GetAllCustomers(ICustomerService<Customer> customerRepo)
     {
-        var allCustomers = service.Customers;
+        var allCustomers = await customerRepo.GetAllAsync();
 
         if (allCustomers is null)
         {

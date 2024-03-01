@@ -1,6 +1,7 @@
 ﻿using DataAccess.Entities;
 using DataAccess.Repository;
 using Microsoft.AspNetCore.Mvc;
+using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 namespace BlazorLABB.Client.Extensions;
 
@@ -21,9 +22,9 @@ public static class CustomerInteractionEndpoints
         return app;
     }
 
-    private static List<Product?> GetAllItemsFromCustomerCart(CustomerRepository service, int userId)
+    private static async Task<List<Product?>> GetAllItemsFromCustomerCart(ICustomerService<Customer> customerRepo, int userId)
     {
-        var customer = service.Customers.FirstOrDefault(c => c.Id == userId);
+        var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
         {
             Results.BadRequest($"The customer with id {userId} could not be found");
@@ -37,16 +38,23 @@ public static class CustomerInteractionEndpoints
 
     }
 
-    private static Order CreateCustomerOrder(CustomerRepository service, int userId)
+    private static async Task<Order> CreateCustomerOrder(ICustomerService<Customer> customerRepo, int userId)
     {
-        var customer = service.Customers.FirstOrDefault(c => c.Id == userId);
+        var customer = await customerRepo.GetByIdAsync(userId);
+
+        if (customer is null)
+        {
+            Results.BadRequest($"The customer with id {userId} could not be found");
+            return null;
+        }
+
         if (customer?.Cart.Count == 0)
         {
             Results.BadRequest("The cart is empty");
             return null;
         }
 
-        //TODO Se över
+        //TODO Lägg till att räkna ut totalpris till FRONTEND 
         var totalPrice = customer.Cart.Sum(p => p.Price);
 
         var order = new Order
@@ -60,13 +68,14 @@ public static class CustomerInteractionEndpoints
 
 
         //TODO Lägg till att rensa cart
-        Results.Ok();
+        Results.Ok("Customer cart are now added to a order");
         return order;
+        
     }
 
-    private static void UpdateCustomerInfo(CustomerRepository service, int userId, [FromBody] ContactInfo contactInfo)
+    private static async void UpdateCustomerInfo(ICustomerService<Customer> customerRepo, int userId, [FromBody] ContactInfo contactInfo)
     {
-        var customer = service.Customers.FirstOrDefault(c => c.Id == userId);
+        var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
         {
             Results.NotFound($"The customer with id {userId} could not be found");
@@ -74,11 +83,12 @@ public static class CustomerInteractionEndpoints
         }
 
         customer.ContactInfo = contactInfo;
-        Results.Ok();
+        Results.Ok("Contact info are now updated");
     }
-    private static void UpdateCustomerPassword(CustomerRepository service, int userId, string newPassword)
+
+    private static async void UpdateCustomerPassword(ICustomerService<Customer> customerRepo, int userId, string newPassword)
     {
-        var customer = service.Customers.FirstOrDefault(c => c.Id == userId);
+        var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
         {
             Results.NotFound($"The customer with id {userId} could not be found");
@@ -86,12 +96,12 @@ public static class CustomerInteractionEndpoints
         }
 
         customer.Password = newPassword;
-        Results.Ok();
+        Results.Ok("Password updated");
     }
 
-    private static void ClearCustomerCart(CustomerRepository service, int userId)
+    private static async void ClearCustomerCart(ICustomerService<Customer> customerRepo, int userId)
     {
-        var customer = service.Customers.FirstOrDefault(c => c.Id == userId);
+        var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
         {
             Results.NotFound($"The customer with id {userId} could not be found");
@@ -99,34 +109,34 @@ public static class CustomerInteractionEndpoints
         }
 
         customer.Cart.Clear();
-        Results.Ok();
+        Results.Ok("Customer cart are now empty.");
     }
 
-    private static void AddProductToCustomerCart(CustomerRepository service, ProductRepository prodService, int userId, int productId)
+    private static async void AddProductToCustomerCart(ICustomerService<Customer> customerRepo, IProductService<Product> productRepo, int userId, int productId)
     {
-        var customer = service.Customers.FirstOrDefault(c => c.Id == userId);
+        var customer =  await customerRepo.GetByIdAsync(userId);
         if (customer is null)
         {
             Results.NotFound($"The customer with id {userId} could not be found");
             return;
         }
 
-        var product = prodService.Products.FirstOrDefault(p => p.Id == productId);
+        var product = await productRepo.GetByIdAsync(productId);
 
         customer.Cart.Add(product);
         Results.Ok();
     }
 
-    private static void RemoveProductFromCustomerCart(CustomerRepository service, ProductRepository pService, int userId, int productId)
+    private static async void RemoveProductFromCustomerCart(ICustomerService<Customer> customerRepo, IProductService<Product> productRepo, int userId, int productId)
     {
-        var customer = service.Customers.FirstOrDefault(c => c.Id == userId);
+        var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
         {
             Results.NotFound($"The customer with id {userId} could not be found");
             return;
         }
 
-        var product = pService.Products.FirstOrDefault(p => p.Id == productId);
+        var product = await productRepo.GetByIdAsync(productId);
 
         customer.Cart.Remove(product);
         Results.Ok();

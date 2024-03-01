@@ -1,5 +1,6 @@
 ﻿using DataAccess.Entities;
 using DataAccess.Repository;
+using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 
 namespace BlazorLABB.Client.Extensions;
@@ -19,40 +20,47 @@ public static class CategoryEndpointExtensions
         return app;
     }
 
-    private static void DeleteCategory(CategoryRepository service, int id)
+    private static void DeleteCategory(ICategoryService<Category> repository, int id)
     {
-        var categoryToDelete = service.Categories.FirstOrDefault(c => c.Id == id);
+        var categoryToDelete = repository.DeleteAsync(id);
 
         if (categoryToDelete is null)
         {
-            Results.NotFound();
+            Results.NotFound($"The category with id {id} could not be found");
             return;
         }
 
-        service.Categories.Remove(categoryToDelete);
+        repository.DeleteAsync(categoryToDelete.Id);
+        Results.Ok("Product deleted successfully");
 
     }
 
-    private static void AddCategory(CategoryRepository service, Category category)
+    private static async void AddCategory(ICategoryService<Category> repository, Category category)
     {
-        if (service.Categories.Any(c => c.Name.ToLower() == category.Name.ToLower()))
+
+        var categoryToAdd =await repository.GetAllAsync();
+
+        if (!categoryToAdd.ToList().Any(c => c.Name.ToLower().Equals(category.Name.ToLower())))
         {
             Results.BadRequest($"The category with name {category.Name} already exists");
             return;
         }
 
-        service.Categories.Add(category);
+        repository.AddAsync(category);
+        Results.Ok("Category added");
     }
 
-    private static List<Category> GetAllCategories(CategoryRepository service)
+    private static async Task<List<Category>> GetAllCategories(ICategoryService<Category> repository)
     {
-        var categories = service.Categories;
+        var categories = await repository.GetAllAsync();
 
-        if (categories.Count == 0)
+        if (categories.Count() <= 0)
         {
-            Results.NotFound();
+            Results.NotFound("No categories found");
         }
 
-        return categories;
+        Results.Ok("Category added");
+        return categories.ToList();
     }
+
 }

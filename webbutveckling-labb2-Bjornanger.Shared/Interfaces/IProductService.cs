@@ -1,9 +1,13 @@
-﻿namespace webbutveckling_labb2_Bjornanger.Shared.Interfaces;
+﻿using webbutveckling_labb2_Bjornanger.Shared.DTOs;
 
-public interface IProductService
+namespace webbutveckling_labb2_Bjornanger.Shared.Interfaces;
+
+public interface IProductService <T>: IService<T> where T : class
 {
-    Task<T> GetProductByIdAsync(int id);
-    Task<IEnumerable<T>> GetProductsByCategoryIdAsync(int id);
-    Task<IEnumerable<T>> GetProductsByNameAsync(string productName);
+  Task<T> UpdateAsync(T entity);
 
-   }
+  Task<T> GetProductByNameAsync(string name);
+
+
+
+}
