@@ -1,0 +1,21 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
+
+namespace DataAccess.Entities;
+
+public class Order
+{
+    [Key]
+    public int Id { get; set; }
+
+    public DateTime OrderDate { get; set; }
+
+    public double TotalPrice { get; set; }
+
+    public int CustomerId { get; set; }
+    public virtual List<Product> ProductsInOrder { get; set; }
+
+    public bool Status { get; set; } // Sätta 0, 1 till status - mottagen / skickad
+    
+
+}
