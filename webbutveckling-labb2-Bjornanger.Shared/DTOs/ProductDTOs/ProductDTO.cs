@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace webbutveckling_labb2_Bjornanger.Shared.DTOs;
+namespace webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTO;
 
 public class ProductDTO
 {

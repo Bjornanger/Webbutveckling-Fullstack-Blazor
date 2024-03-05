@@ -1,6 +1,6 @@
-﻿using DataAccess.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using webbutveckling_labb2_Bjornanger.Shared.DTOs;
+using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 namespace DataAccess.Repository;

@@ -1,9 +1,8 @@
-﻿using DataAccess.Entities;
-using DataAccess.Repository;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
-namespace BlazorLABB.Client.Extensions;
+namespace webbutveckling_labb2_Bjornanger.API.Extensions;
 
 public static class CustomerInteractionEndpoints
 {
@@ -33,19 +32,37 @@ public static class CustomerInteractionEndpoints
 
         var items = customer.Cart.ToList();
 
+        foreach (var prod in items)
+        {
+            if (prod is null)
+            {
+                Results.NotFound("No products found in cart");
+                return null;
+            }
+            
+            
+                Console.WriteLine($"Product: {prod.Name}");
+                Console.WriteLine($"Description: {prod.Description}");
+                Console.WriteLine($"Price: {prod.Price}");
+            
+
+            
+        }
+
+
         Results.Ok();
         return items;
 
     }
 
-    private static async Task<Order> CreateCustomerOrder(ICustomerService<Customer> customerRepo, int userId)
+    private static async Task<Order> CreateCustomerOrder(ICustomerService<Customer> customerRepo,IOrderService<Order> orderRepo, int userId)
     {
         var customer = await customerRepo.GetByIdAsync(userId);
 
         if (customer is null)
         {
-            Results.BadRequest($"The customer with id {userId} could not be found");
-            return null;
+              Results.BadRequest($"The customer with id {userId} could not be found");
+              return null;
         }
 
         if (customer?.Cart.Count == 0)
@@ -61,85 +78,119 @@ public static class CustomerInteractionEndpoints
         {
             CustomerId = customer.Id,
             ProductsInOrder = customer.Cart,
-            OrderDate = DateTime.Now,
+            OrderDate = DateTime.UtcNow,
             TotalPrice = totalPrice,
             Status = false,
         };
 
+        await orderRepo.AddAsync(order);
+       
+        var allOrders = await orderRepo.GetAllAsync();
+
+        if (allOrders is null)
+        {
+             Results.NotFound("No orders found");
+             return null;
+        }
+
+        var lastOrder = allOrders.ToList().LastOrDefault();
+        
+        foreach (var product in customer.Cart.DistinctBy(p => p.Id))
+        {
+            var lastOrderId = lastOrder.Id;
+            var productId = product.Id;
+            var productAmount = customer.Cart.Select(p => p.Id == product.Id).Count();
+            await orderRepo.AddToProductOrders(new ProductsOrders
+            {
+                ProductId = productId,
+                OrderId = lastOrderId,
+                Amount = productAmount,
+                
+            });
+            
+        }
+        customer.Orders.Add(lastOrder.Id);
+        
+        
+        
 
         //TODO Hämta Metoden ClearCustomerCart och använd den här för att tömma kundvagnen efter att ordern är skapad.
-        Results.Ok("Customer cart are now added to a order");
+        
         
         return order;
+        
 
     }
 
-    private static async Task UpdateCustomerInfo(ICustomerService<Customer> customerRepo, int userId, [FromBody] ContactInfo contactInfo)
+    private static async Task<IResult> UpdateCustomerInfo(ICustomerService<Customer> customerRepo, int userId, [FromBody] ContactInfo contactInfo)
     {
         var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
         {
-            Results.NotFound($"The customer with id {userId} could not be found");
-            return;
+            return Results.NotFound($"The customer with id {userId} could not be found");
+            
         }
 
         customer.ContactInfo = contactInfo;
-        Results.Ok("Contact info are now updated");
+         return Results.Ok("Contact info are now updated");
     }
 
-    private static async Task UpdateCustomerPassword(ICustomerService<Customer> customerRepo, int userId, string newPassword)
+    private static async Task<IResult> UpdateCustomerPassword(ICustomerService<Customer> customerRepo, int userId, string newPassword)
     {
         var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
         {
-            Results.NotFound($"The customer with id {userId} could not be found");
-            return;
+            return Results.NotFound($"The customer with id {userId} could not be found");
+            
         }
 
         customer.Password = newPassword;
-        Results.Ok("Password updated");
+         return Results.Ok("Password updated");
     }
 
-    private static async Task ClearCustomerCart(ICustomerService<Customer> customerRepo, int userId)
+    private static async Task<IResult> ClearCustomerCart(ICustomerService<Customer> customerRepo, int userId)
     {
         var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
         {
-            Results.NotFound($"The customer with id {userId} could not be found");
-            return;
+            return Results.NotFound($"The customer with id {userId} could not be found");
+            
         }
 
         customer.Cart.Clear();
-        Results.Ok("Customer cart are now empty.");
+         return Results.Ok("Customer cart are now empty.");
     }
 
-    private static async Task AddProductToCustomerCart(ICustomerService<Customer> customerRepo, IProductService<Product> productRepo, int userId, int productId)
+    private static async Task<IResult> AddProductToCustomerCart(ICustomerService<Customer> customerRepo, IProductService<Product> productRepo, int userId, int productId)
     {
         var customer =  await customerRepo.GetByIdAsync(userId);
         if (customer is null)
         {
-            Results.NotFound($"The customer with id {userId} could not be found");
-            return;
+            return Results.NotFound($"The customer with id {userId} could not be found");
+            
         }
 
         var product = await productRepo.GetByIdAsync(productId);
 
         customer.Cart.Add(product);
-        Results.Ok();
+        return Results.Ok();
     }
 
-    private static async Task RemoveProductFromCustomerCart(ICustomerService<Customer> customerRepo, IProductService<Product> productRepo, int userId, int productId)
+    private static async Task<IResult> RemoveProductFromCustomerCart(ICustomerService<Customer> customerRepo, IProductService<Product> productRepo, int userId, int productId)
     {
         var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
         {
-            Results.NotFound($"The customer with id {userId} could not be found");
-            return;
+            return Results.NotFound($"The customer with id {userId} could not be found");
+            
         }
 
         var product = await productRepo.GetByIdAsync(productId);
 
         customer.Cart.Remove(product);
-        Results.Ok();
+         return Results.Ok();
     }
+
+
+
 }

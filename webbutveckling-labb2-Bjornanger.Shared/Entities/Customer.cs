@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DataAccess.Entities;
+namespace webbutveckling_labb2_Bjornanger.Shared.Entities;
 
 public class Customer : User
 {
@@ -13,7 +13,7 @@ public class Customer : User
 
     public ContactInfo ContactInfo { get; set; }
 
-    public virtual List<Order> Orders { get; set; } = new();
+    public virtual List<int> Orders { get; set; } = new();
     public virtual List<Product> Cart { get; set; } = new();
 
     

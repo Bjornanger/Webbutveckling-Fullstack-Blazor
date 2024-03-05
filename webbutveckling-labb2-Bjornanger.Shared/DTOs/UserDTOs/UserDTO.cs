@@ -1,17 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DataAccess.Entities;
+namespace webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs;
 
-public class User
+public class UserDTO
 {
-    [Key]
-
-    public int Id { get; set; }
     [EmailAddress]
     [Required]
     public string Email { get; set; }
     [Required]
     public string Password { get; set; }
-
-
 }

@@ -1,8 +1,8 @@
-using BlazorLABB.Client.Extensions;
 using DataAccess;
-using DataAccess.Entities;
 using DataAccess.Repository;
 using Microsoft.EntityFrameworkCore;
+using webbutveckling_labb2_Bjornanger.API.Extensions;
+using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);

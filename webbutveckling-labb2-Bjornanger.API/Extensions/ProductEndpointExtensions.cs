@@ -1,9 +1,7 @@
-﻿using DataAccess.Entities;
-using DataAccess.Repository;
+﻿using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
-
-namespace BlazorLABB.Client.Extensions;
+namespace webbutveckling_labb2_Bjornanger.API.Extensions;
 
 public static class ProductEndpointExtensions 
 {
@@ -25,54 +23,82 @@ public static class ProductEndpointExtensions
         return app;
     }
 
-    private static async Task DeleteProduct(IProductService<Product> repository, int id)
+    private static async Task<IResult> DeleteProduct(IProductService<Product> repository, int id)
     {
+
+        //TODO: Kontroll på att lagerstatus återställs om en produkt tas bort
         var product = await repository.GetByIdAsync(id);
         if (product is null)
         {
-            Results.NotFound($"The product with id {id} could not be found");
-            return;
+            return Results.NotFound($"The product with id {id} could not be found");
+            
         }
         
-        Results.Ok("Product deleted successfully");
+        
         await repository.DeleteAsync(product.Id);
+        return Results.Ok("Product deleted successfully");
     }
 
-    private static async Task UpdateProduct(IProductService<Product> repository, Product product, int id)
+    private static async Task<IResult> UpdateProduct(IProductService<Product> productRepo, ICategoryService<Category> categoryRepo, Product product, int id)
     {
+
+        //TODO: Göra så att man hittar category id för att lägga in detta i producten och skriva ut vilket category-name den tillhör.
        
-        var prod = await repository.GetByIdAsync(id);
+        var prod = await productRepo.GetByIdAsync(id);
         if (prod is null)
         {
-            Results.BadRequest($"The product with id {id} could not be found");
-            return;
+            return Results.BadRequest($"The product with id {id} could not be found");
+            
         }
-
+        
         prod.Name = product.Name;
         prod.Description = product.Description;
         prod.Price = product.Price;
-        prod.Category = product.Category;
+
+        if (product.Category is not null)
+        {
+            var existingCategory = await categoryRepo.GetByIdAsync(product.Category.Id);
+            if (existingCategory is null)
+            {
+                return Results.BadRequest($"The category with id: {product.Category.Id} and Name:{product.Category.Name} does not exist");
+            }
+
+            prod.Category.Id = existingCategory.Id;
+
+
+        }
+
+        
         prod.ImageUrl = product.ImageUrl;
 
-        await repository.UpdateAsync(prod);
-        Results.Ok();
+        await productRepo.UpdateAsync(prod);
+        return Results.Ok();
     }
 
 
-    private static async Task AddProduct(IProductService<Product> repository, Product product)
+    private static async Task<IResult> AddProduct(IProductService<Product> repository, Product product)
     {
+        //TODO: Kontroll på att lagerstatus inte är 0 eller mindre
 
         var prodToAdd = await repository.GetAllAsync();
+
+        if (prodToAdd is null)
+        {
+            return null;
+        }
+
+
         if(prodToAdd
            .ToList().Any(p => p.Name.ToLower() == product.Name.ToLower()))
         {
-            Results.BadRequest($"The product with name {product.Name} already exists");
-            return;
+            return Results.BadRequest($"The product with name {product.Name} already exists");
+           
         }
 
         
         await repository.AddAsync(product);
-        Results.Ok($"{product.Name} added");
+         return Results.Ok($"{product.Name} added");
+
     }
 
     private static async Task<List<Product>> GetProductsByCategory(IProductService<Product> repository,ICategoryService<Category> categoryRepo, string category)
@@ -151,8 +177,6 @@ public static class ProductEndpointExtensions
 
         //fixa så att hela produkten skrivs ut i console/postman
        
-        
-
 
         Results.Ok();
          return prodList.ToList();

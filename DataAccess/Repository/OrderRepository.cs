@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DataAccess.Entities;
+using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 namespace DataAccess.Repository;
@@ -26,12 +26,21 @@ public class OrderRepository : IOrderService<Order>
     public async Task AddAsync(Order newOrder)
     {
         await _context.Orders.AddAsync(newOrder);
+        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id)
     {
        var orderToDelete = await _context.Orders.FindAsync(id);
         _context.Orders.Remove(orderToDelete);
+        await _context.SaveChangesAsync();
+    }
+
+    
+
+    public async Task AddToProductOrders(ProductsOrders orders)
+    {
+        await _context.ProductOrders.AddAsync(orders);
         await _context.SaveChangesAsync();
     }
 }

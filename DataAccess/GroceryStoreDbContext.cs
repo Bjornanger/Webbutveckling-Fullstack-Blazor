@@ -1,5 +1,5 @@
-﻿using DataAccess.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using webbutveckling_labb2_Bjornanger.Shared.Entities;
 
 namespace DataAccess;
 //TODO: Kolla så att alla kopplinar används

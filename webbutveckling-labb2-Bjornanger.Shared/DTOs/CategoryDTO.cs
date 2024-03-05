@@ -6,5 +6,5 @@ public class CategoryDTO
 {
     [Required]
     public string Name { get; set; }
-    public List<ProductDTO> ProductInCatagory { get; set; } = new();
+    public List<ProductDTO.ProductDTO> ProductInCatagory { get; set; } = new();
 }

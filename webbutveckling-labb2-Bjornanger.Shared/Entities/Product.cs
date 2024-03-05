@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DataAccess.Entities;
+namespace webbutveckling_labb2_Bjornanger.Shared.Entities;
 
 public class Product
 {

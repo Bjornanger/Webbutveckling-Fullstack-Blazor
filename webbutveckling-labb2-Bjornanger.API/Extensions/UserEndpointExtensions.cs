@@ -1,9 +1,7 @@
-﻿using DataAccess.Entities;
-using DataAccess.Repository;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
-namespace BlazorLABB.Client.Extensions;
+namespace webbutveckling_labb2_Bjornanger.API.Extensions;
 
 public static class UserEndpointExtensions
 {
@@ -43,49 +41,52 @@ public static class UserEndpointExtensions
     }
 
 
-    private static async Task AddNewAdmin(IAdminService<Admin> adminRepo, Admin newAdmin)
+    private static async Task<IResult> AddNewAdmin(IAdminService<Admin> adminRepo, Admin newAdmin)
     {
         var newAdminToAdd = await adminRepo.GetAllAsync();
 
         if (newAdminToAdd.ToList().Any(a => a.Id.Equals(newAdmin.Id)))
         {
-            Results.NotFound($"Admin with id:{newAdmin.Id} and {newAdmin.UserName} already exists.");
+            return Results.NotFound($"Admin with id:{newAdmin.Id} and {newAdmin.UserName} already exists.");
         }
 
-        Results.Ok();
+        
         await adminRepo.AddAsync(newAdmin);
+        return Results.Ok("New Admin added.");
 
 
     }
 
-    private static async Task DeleteCustomer(ICustomerService<Customer> customerRepo, int userId)
+    private static async Task<IResult> DeleteCustomer(ICustomerService<Customer> customerRepo, int userId)
     {
         var userToRemove = await customerRepo.GetByIdAsync(userId);
         if (userToRemove is null)
         {
-            Results.BadRequest($"User with {userId}  not found");
-            return;
+            return Results.BadRequest($"User with {userId}  not found");
+            
         }
 
-        Results.Ok($"User: {userToRemove.Id} {userToRemove.FirstName} found and Removed.");
+        
         await customerRepo.DeleteAsync(userToRemove.Id);
+        return Results.Ok($"User: {userToRemove.Id} {userToRemove.FirstName} found and Removed.");
     }
 
    
 
-    private static async Task AddNewCustomer(ICustomerService<Customer> customerRepo, Customer newCustomer)
+    private static async Task<IResult> AddNewCustomer(ICustomerService<Customer> customerRepo, Customer newCustomer)
     {
         var customerToAdd = await customerRepo.GetAllAsync();
 
 
         if (customerToAdd.ToList().Any(p => p.Id == newCustomer.Id))
         {
-            Results.BadRequest($"The Customer with this Email: {newCustomer.Id} already exists");
-            return;
+            return Results.BadRequest($"The Customer with this Email: {newCustomer.Id} already exists");
+           
         }
-        Results.Ok();
-        await customerRepo.AddAsync(newCustomer);
         
+        await customerRepo.AddAsync(newCustomer);
+        return Results.Ok("Customer added");
+
     }
 
     private static async Task<Customer?> GetUserByEmail(ICustomerService<Customer> customerRepo, string email)

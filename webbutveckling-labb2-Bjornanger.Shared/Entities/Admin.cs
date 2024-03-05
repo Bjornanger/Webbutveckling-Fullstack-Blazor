@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DataAccess.Entities;
 
-namespace DataAccess.Entities;
+namespace webbutveckling_labb2_Bjornanger.Shared.Entities;
 
 public class Admin : User
 {

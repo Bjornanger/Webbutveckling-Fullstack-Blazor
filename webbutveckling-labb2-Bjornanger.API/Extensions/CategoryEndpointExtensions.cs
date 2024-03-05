@@ -1,9 +1,7 @@
-﻿using DataAccess.Entities;
-using DataAccess.Repository;
+﻿using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
-
-namespace BlazorLABB.Client.Extensions;
+namespace webbutveckling_labb2_Bjornanger.API.Extensions;
 
 public static class CategoryEndpointExtensions
 {
@@ -20,37 +18,39 @@ public static class CategoryEndpointExtensions
         return app;
     }
 
-    private static async Task DeleteCategory(ICategoryService<Category> categoryRepo, int id)
+    private static async Task<IResult> DeleteCategory(ICategoryService<Category> categoryRepo, int id)
     {
 
         var findCategoryToDelete = await categoryRepo.GetByIdAsync(id);
 
         if (findCategoryToDelete is null)
         {
-            Results.NotFound($"The category with id {id} could not be found");
-            return;
+            return Results.NotFound($"The category with id {id} could not be found");
+            
         }
-        
-        Results.Ok("Product deleted successfully");
+
+
         await categoryRepo.DeleteAsync(findCategoryToDelete.Id);
+        return Results.Ok("Category deleted successfully");
+        
 
 
     }
 
-    private static async Task AddCategory(ICategoryService<Category> repository, Category category)
+    private static async Task<IResult> AddCategory(ICategoryService<Category> repository, Category category)
     {
 
         var categoryToAdd =await repository.GetAllAsync();
 
-        if (!categoryToAdd.ToList().Any(c => c.Name.ToLower().Equals(category.Name.ToLower())))
+        if (categoryToAdd.ToList().Any(c => c.Name.ToLower().Equals(category.Name.ToLower())))
         {
-            Results.BadRequest($"The category with name {category.Name} already exists");
-            return;
+            return Results.BadRequest($"The category with name {category.Name} already exists");
+            
         }
 
-       
-        Results.Ok("Category added");
         await repository.AddAsync(category);
+        return Results.Ok("Category added");
+        
     }
 
     private static async Task<List<Category>> GetAllCategories(ICategoryService<Category> repository)

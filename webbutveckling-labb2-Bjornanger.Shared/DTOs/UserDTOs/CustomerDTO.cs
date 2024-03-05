@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace webbutveckling_labb2_Bjornanger.Shared.DTOs;
+namespace webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs;
 
 public class CustomerDTO
 {
@@ -14,5 +14,5 @@ public class CustomerDTO
     public ContactInfoDTO ContactInfo { get; set; }
 
     public virtual List<OrderDTO> Orders { get; set; } = new();
-    public virtual List<ProductDTO> Cart { get; set; } = new();
+    public virtual List<ProductDTO.ProductDTO> Cart { get; set; } = new();
 }
