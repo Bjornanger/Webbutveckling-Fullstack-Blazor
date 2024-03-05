@@ -67,13 +67,14 @@ public static class CustomerInteractionEndpoints
         };
 
 
-        //TODO Lägg till att rensa cart
+        //TODO Hämta Metoden ClearCustomerCart och använd den här för att tömma kundvagnen efter att ordern är skapad.
         Results.Ok("Customer cart are now added to a order");
-        return order;
         
+        return order;
+
     }
 
-    private static async void UpdateCustomerInfo(ICustomerService<Customer> customerRepo, int userId, [FromBody] ContactInfo contactInfo)
+    private static async Task UpdateCustomerInfo(ICustomerService<Customer> customerRepo, int userId, [FromBody] ContactInfo contactInfo)
     {
         var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
@@ -86,7 +87,7 @@ public static class CustomerInteractionEndpoints
         Results.Ok("Contact info are now updated");
     }
 
-    private static async void UpdateCustomerPassword(ICustomerService<Customer> customerRepo, int userId, string newPassword)
+    private static async Task UpdateCustomerPassword(ICustomerService<Customer> customerRepo, int userId, string newPassword)
     {
         var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
@@ -99,7 +100,7 @@ public static class CustomerInteractionEndpoints
         Results.Ok("Password updated");
     }
 
-    private static async void ClearCustomerCart(ICustomerService<Customer> customerRepo, int userId)
+    private static async Task ClearCustomerCart(ICustomerService<Customer> customerRepo, int userId)
     {
         var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
@@ -112,7 +113,7 @@ public static class CustomerInteractionEndpoints
         Results.Ok("Customer cart are now empty.");
     }
 
-    private static async void AddProductToCustomerCart(ICustomerService<Customer> customerRepo, IProductService<Product> productRepo, int userId, int productId)
+    private static async Task AddProductToCustomerCart(ICustomerService<Customer> customerRepo, IProductService<Product> productRepo, int userId, int productId)
     {
         var customer =  await customerRepo.GetByIdAsync(userId);
         if (customer is null)
@@ -127,7 +128,7 @@ public static class CustomerInteractionEndpoints
         Results.Ok();
     }
 
-    private static async void RemoveProductFromCustomerCart(ICustomerService<Customer> customerRepo, IProductService<Product> productRepo, int userId, int productId)
+    private static async Task RemoveProductFromCustomerCart(ICustomerService<Customer> customerRepo, IProductService<Product> productRepo, int userId, int productId)
     {
         var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)

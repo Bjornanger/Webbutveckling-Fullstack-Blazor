@@ -7,7 +7,4 @@ public class Admin : User
 {
     [Required]
     public string UserName { get; set; }
-
-
-
 }

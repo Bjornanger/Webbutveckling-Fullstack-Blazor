@@ -18,26 +18,27 @@ public static class ProductEndpointExtensions
         group.MapGet("/category/{category}", GetProductsByCategory);
 
         group.MapPost("/", AddProduct);
+
         group.MapPatch("/{id}", UpdateProduct);
         group.MapDelete("/{id}", DeleteProduct);
 
         return app;
     }
 
-    private static void DeleteProduct(IProductService<Product> repository, int id)
+    private static async Task DeleteProduct(IProductService<Product> repository, int id)
     {
-        var product = repository.GetByIdAsync(id);
+        var product = await repository.GetByIdAsync(id);
         if (product is null)
         {
             Results.NotFound($"The product with id {id} could not be found");
             return;
         }
-
-        repository.DeleteAsync(product.Id);
+        
         Results.Ok("Product deleted successfully");
+        await repository.DeleteAsync(product.Id);
     }
 
-    private static async void UpdateProduct(IProductService<Product> repository, Product product, int id)
+    private static async Task UpdateProduct(IProductService<Product> repository, Product product, int id)
     {
        
         var prod = await repository.GetByIdAsync(id);
@@ -58,7 +59,7 @@ public static class ProductEndpointExtensions
     }
 
 
-    private static async void AddProduct(IProductService<Product> repository, Product product)
+    private static async Task AddProduct(IProductService<Product> repository, Product product)
     {
 
         var prodToAdd = await repository.GetAllAsync();
@@ -70,8 +71,8 @@ public static class ProductEndpointExtensions
         }
 
         
-        repository.AddAsync(product);
-        Results.Ok();
+        await repository.AddAsync(product);
+        Results.Ok($"{product.Name} added");
     }
 
     private static async Task<List<Product>> GetProductsByCategory(IProductService<Product> repository,ICategoryService<Category> categoryRepo, string category)
@@ -107,9 +108,9 @@ public static class ProductEndpointExtensions
         return products;
     }
 
-    private static Task<Product> GetProductByName(IProductService<Product> repository, string name)
+    private static async Task<Product> GetProductByName(IProductService<Product> repository, string name)
     {
-        var productName = repository.GetProductByNameAsync(name.ToLower());
+        var productName = await repository.GetProductByNameAsync(name.ToLower());
         
         if (productName is null)
         {
@@ -147,7 +148,13 @@ public static class ProductEndpointExtensions
             Results.NotFound("No products in list");
             return null;
         }
+
+        //fixa så att hela produkten skrivs ut i console/postman
+       
+        
+
+
         Results.Ok();
-        return prodList;
+         return prodList.ToList();
     }
 }

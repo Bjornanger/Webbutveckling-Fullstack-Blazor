@@ -17,27 +17,48 @@ public static class UserEndpointExtensions
         group.MapGet("/customers", GetAllCustomers);
 
         //TODO skapa en egen Admin-lista för att kunna söka och lägga till i.
-        //group.MapGet("/users/admin", GetAllAdmins);
+        group.MapGet("/users/admin", GetAllAdmins);
         group.MapGet("/{userId:int}", GetUserById);
         group.MapGet("/{email}", GetUserByEmail);
 
         group.MapPost("/customers", AddNewCustomer);
-        //group.MapPost("/users/admins", AddNewAdmin);
+        group.MapPost("/users/admins", AddNewAdmin);
         group.MapDelete("/{userId:int}", DeleteCustomer);
         return app;
 
     }
 
-    //private static async Task GetAllAdmins(HttpContext context)
-    //{
+    private static async Task<List<Admin>> GetAllAdmins(IAdminService<Admin> adminRepo)
+    {
+        var allAdmins = await adminRepo.GetAllAsync();
 
-    //}
-    //private static async void AddNewAdmin(IAdminService<Admin> newAdmin)
-    //{
+        if (allAdmins is null)
+        {
+            Results.BadRequest("No Admins found");
+            return null;
+        }
 
-    //}
+        Results.Ok();
+        return allAdmins.ToList();
+    }
 
-    private static async void DeleteCustomer(ICustomerService<Customer> customerRepo, int userId)
+
+    private static async Task AddNewAdmin(IAdminService<Admin> adminRepo, Admin newAdmin)
+    {
+        var newAdminToAdd = await adminRepo.GetAllAsync();
+
+        if (newAdminToAdd.ToList().Any(a => a.Id.Equals(newAdmin.Id)))
+        {
+            Results.NotFound($"Admin with id:{newAdmin.Id} and {newAdmin.UserName} already exists.");
+        }
+
+        Results.Ok();
+        await adminRepo.AddAsync(newAdmin);
+
+
+    }
+
+    private static async Task DeleteCustomer(ICustomerService<Customer> customerRepo, int userId)
     {
         var userToRemove = await customerRepo.GetByIdAsync(userId);
         if (userToRemove is null)
@@ -48,13 +69,11 @@ public static class UserEndpointExtensions
 
         Results.Ok($"User: {userToRemove.Id} {userToRemove.FirstName} found and Removed.");
         await customerRepo.DeleteAsync(userToRemove.Id);
-        
-
     }
 
    
 
-    private static async void AddNewCustomer(ICustomerService<Customer> customerRepo, Customer newCustomer)
+    private static async Task AddNewCustomer(ICustomerService<Customer> customerRepo, Customer newCustomer)
     {
         var customerToAdd = await customerRepo.GetAllAsync();
 
@@ -65,11 +84,11 @@ public static class UserEndpointExtensions
             return;
         }
         Results.Ok();
-        customerRepo.AddAsync(newCustomer);
+        await customerRepo.AddAsync(newCustomer);
         
     }
 
-    private static async Task<Customer> GetUserByEmail(ICustomerService<Customer> customerRepo, string email)
+    private static async Task<Customer?> GetUserByEmail(ICustomerService<Customer> customerRepo, string email)
     {
         var allCustomers = await customerRepo.GetAllAsync();
 

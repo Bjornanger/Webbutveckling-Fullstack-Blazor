@@ -17,8 +17,11 @@ public class Product
 
     public Category Category { get; set; }
 
-    public bool Status { get; set; } = default; //Lägg in om det visar 0 skriv ut test - Out of Stock.
+    public bool Status { get; set; } 
     [Url] 
-    public string ImageUrl { get; set; } // = "../image" - Kolla upp i LAbb2 Databaser.Lägg till en default bild
-    public int Stock { get; set; } 
+    public string ImageUrl { get; set; } // = "../image" - Kolla upp i Labb2 Databaser.Lägg till en default bild
+    public int Stock { get; set; }
+
+    public virtual ICollection<ProductsOrders> ProductOrders { get; set; }
+
 }

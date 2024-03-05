@@ -44,12 +44,8 @@ public class ProductRepository : IProductService<Product>
        if (prodToUpdate is null)
        {
               return null;
-         }
-       //prodToUpdate.Name = prod.Name;
-       //prodToUpdate.Description = prod.Description;
-       //prodToUpdate.Price = prod.Price;
-       //prodToUpdate.Category = prod.Category;
-       //prodToUpdate.ImageUrl = prod.ImageUrl;
+       }
+       
        
        await _context.SaveChangesAsync();
        return prodToUpdate;

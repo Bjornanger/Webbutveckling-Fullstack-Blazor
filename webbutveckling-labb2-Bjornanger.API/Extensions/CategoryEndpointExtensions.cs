@@ -20,22 +20,24 @@ public static class CategoryEndpointExtensions
         return app;
     }
 
-    private static void DeleteCategory(ICategoryService<Category> repository, int id)
+    private static async Task DeleteCategory(ICategoryService<Category> categoryRepo, int id)
     {
-        var categoryToDelete = repository.DeleteAsync(id);
 
-        if (categoryToDelete is null)
+        var findCategoryToDelete = await categoryRepo.GetByIdAsync(id);
+
+        if (findCategoryToDelete is null)
         {
             Results.NotFound($"The category with id {id} could not be found");
             return;
         }
-
-        repository.DeleteAsync(categoryToDelete.Id);
+        
         Results.Ok("Product deleted successfully");
+        await categoryRepo.DeleteAsync(findCategoryToDelete.Id);
+
 
     }
 
-    private static async void AddCategory(ICategoryService<Category> repository, Category category)
+    private static async Task AddCategory(ICategoryService<Category> repository, Category category)
     {
 
         var categoryToAdd =await repository.GetAllAsync();
@@ -46,8 +48,9 @@ public static class CategoryEndpointExtensions
             return;
         }
 
-        repository.AddAsync(category);
+       
         Results.Ok("Category added");
+        await repository.AddAsync(category);
     }
 
     private static async Task<List<Category>> GetAllCategories(ICategoryService<Category> repository)

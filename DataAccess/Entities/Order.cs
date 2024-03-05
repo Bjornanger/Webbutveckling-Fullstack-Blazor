@@ -16,6 +16,7 @@ public class Order
     public virtual List<Product> ProductsInOrder { get; set; }
 
     public bool Status { get; set; } // Sätta 0, 1 till status - mottagen / skickad
-    
+
+    public virtual ICollection<ProductsOrders> ProductOrders { get; set; }
 
 }
