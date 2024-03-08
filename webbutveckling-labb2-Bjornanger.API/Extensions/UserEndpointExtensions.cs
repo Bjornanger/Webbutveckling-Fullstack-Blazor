@@ -7,7 +7,7 @@ public static class UserEndpointExtensions
 {
 
 
-    //TODO Skapa en Context-länk för att kunna spara till DB
+    
     public static IEndpointRouteBuilder MapUserEndpointExtensions(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("api/users");
@@ -18,7 +18,6 @@ public static class UserEndpointExtensions
         group.MapGet("/users/admin", GetAllAdmins);
         group.MapGet("/{userId:int}", GetUserById);
         group.MapGet("/{email}", GetUserByEmail);
-
         group.MapPost("/customers", AddNewCustomer);
         group.MapPost("/users/admins", AddNewAdmin);
         group.MapDelete("/{userId:int}", DeleteCustomer);
@@ -70,9 +69,7 @@ public static class UserEndpointExtensions
         await customerRepo.DeleteAsync(userToRemove.Id);
         return Results.Ok($"User: {userToRemove.Id} {userToRemove.FirstName} found and Removed.");
     }
-
-   
-
+    
     private static async Task<IResult> AddNewCustomer(ICustomerService<Customer> customerRepo, Customer newCustomer)
     {
         var customerToAdd = await customerRepo.GetAllAsync();

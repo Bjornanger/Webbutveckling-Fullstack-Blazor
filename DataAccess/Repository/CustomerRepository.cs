@@ -1,4 +1,5 @@
-﻿using webbutveckling_labb2_Bjornanger.Shared.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 namespace DataAccess.Repository;
@@ -69,17 +70,21 @@ public class CustomerRepository : ICustomerService<Customer>
 
     public async Task<IEnumerable<Customer>> GetAllAsync()
     {
-        return _context.Customers;
+        return _context.Customers
+            .Include(c => c.ContactInfo).Include(c => c.Orders);
     }
 
-    public async Task<Customer> GetByIdAsync(int id)
+    public async Task<Customer?> GetByIdAsync(int id)
     {
-       return await _context.Customers.FindAsync(id);
+        return await _context.Customers
+            .Include(c => c.ContactInfo)
+            .Include(c => c.Orders)
+            .FirstOrDefaultAsync(c => c.Id == id);
     }
 
-    public async Task AddAsync(Customer newCustomerty)
+    public async Task AddAsync(Customer newCustomer)
     {
-        await _context.Customers.AddAsync(newCustomerty);
+        await _context.Customers.AddAsync(newCustomer);
         await _context.SaveChangesAsync();
     }
 
@@ -88,5 +93,28 @@ public class CustomerRepository : ICustomerService<Customer>
         var customerToDelete = await _context.Customers.FindAsync(id);
         _context.Customers.Remove(customerToDelete);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<Customer> UpdateAsync(Customer customer, int userId)
+    {
+        var customerToUpdate = await _context.Customers.Include(c => c.ContactInfo)
+            .FirstOrDefaultAsync(c => c.Id == userId);
+        if (customerToUpdate is null)
+        {
+            return null;
+        }
+
+        customerToUpdate.FirstName = customer.FirstName;
+        customerToUpdate.LastName = customer.LastName;  
+        customerToUpdate.Email = customer.Email;
+        customerToUpdate.Password = customer.Password;
+
+        await _context.SaveChangesAsync();
+        return customerToUpdate;
+    }
+
+    public void Save()
+    {
+        _context.SaveChanges();
     }
 }

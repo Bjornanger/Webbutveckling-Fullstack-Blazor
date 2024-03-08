@@ -8,131 +8,90 @@ public static class CustomerInteractionEndpoints
 {
     public static IEndpointRouteBuilder MapCustomerInteractionEndpoints(this IEndpointRouteBuilder app)
     {
+        //TODO: Lägg till endpoint i planeringen
+
         var group = app.MapGroup("api/customer");
 
-        group.MapGet("/{userId}", GetAllItemsFromCustomerCart);
-        group.MapPost("/{userId}", CreateCustomerOrder);
+        group.MapGet("/order/{userId}", GetOrderFromCustomer);//ny lägg till i planeringen
+        group.MapPost("/{userId}", CreateCustomerOrder);// ny lägg till i planeringen
         group.MapPatch("/{userId}", UpdateCustomerInfo);
         group.MapPatch("/password/{userId}/{newPassword}", UpdateCustomerPassword);
-        group.MapPatch("/cart/{userId}", ClearCustomerCart);
-        group.MapPut("/cart/{userId}/{productId}", AddProductToCustomerCart);
-        group.MapDelete("/cart/{userId}/{productId}", RemoveProductFromCustomerCart);
 
         return app;
     }
 
-    private static async Task<List<Product?>> GetAllItemsFromCustomerCart(ICustomerService<Customer> customerRepo, int userId)
+
+    private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> orderRepo,ICustomerService<Customer> customerRepo, int userId)
     {
-        var customer = await customerRepo.GetByIdAsync(userId);
-        if (customer is null)
+
+       var orders = await orderRepo.GetAllAsync();
+
+        if (orders is null)
         {
-            Results.BadRequest($"The customer with id {userId} could not be found");
-            return null;
+            return Results.NotFound("No orders found");
         }
 
-        var items = customer.Cart.ToList();
-
-        foreach (var prod in items)
+        var customerOrderToGet = await customerRepo.GetByIdAsync(userId);
+        var customerOrders = customerOrderToGet.Orders.ToList();
+        if (customerOrders is null)
         {
-            if (prod is null)
-            {
-                Results.NotFound("No products found in cart");
-                return null;
-            }
-            
-            
-                Console.WriteLine($"Product: {prod.Name}");
-                Console.WriteLine($"Description: {prod.Description}");
-                Console.WriteLine($"Price: {prod.Price}");
-            
-
-            
+            return Results.NotFound("No orders found for this customer");
         }
 
-
-        Results.Ok();
-        return items;
-
+        return Results.Ok(customerOrders);
     }
-
-    private static async Task<Order> CreateCustomerOrder(ICustomerService<Customer> customerRepo,IOrderService<Order> orderRepo, int userId)
+    
+    private static async Task<IResult> CreateCustomerOrder(IProductService<Product> prodRepo,
+        ICustomerService<Customer> customerRepo,IOrderService<Order> orderRepo, OrderRequest request)
     {
-        var customer = await customerRepo.GetByIdAsync(userId);
-
+        var customer = await customerRepo.GetByIdAsync(request.CustomerId);
         if (customer is null)
         {
-              Results.BadRequest($"The customer with id {userId} could not be found");
-              return null;
+            return Results.NotFound($"Customer not found");
         }
 
-        if (customer?.Cart.Count == 0)
+        var products = new List<ProductsOrders>();
+        foreach (var productOrder in request.ProductOrders)
         {
-            Results.BadRequest("The cart is empty");
-            return null;
+            var product = await prodRepo.GetByIdAsync(productOrder.ProductId);
+            if (product is null)
+            {
+                return Results.NotFound($"Product not found");
+            }
+            products.Add(
+                new ProductsOrders()
+                {
+                    Amount = productOrder.Amount, 
+                    Product = product
+                });
         }
-
-        //TODO Lägg till att räkna ut totalpris till FRONTEND 
-        var totalPrice = customer.Cart.Sum(p => p.Price);
 
         var order = new Order
         {
-            CustomerId = customer.Id,
-            ProductsInOrder = customer.Cart,
-            OrderDate = DateTime.UtcNow,
-            TotalPrice = totalPrice,
-            Status = false,
+            Customer = customer,
+            ProductOrders = products,
+            OrderDate = DateTime.Now
         };
 
         await orderRepo.AddAsync(order);
-       
-        var allOrders = await orderRepo.GetAllAsync();
 
-        if (allOrders is null)
-        {
-             Results.NotFound("No orders found");
-             return null;
-        }
-
-        var lastOrder = allOrders.ToList().LastOrDefault();
-        
-        foreach (var product in customer.Cart.DistinctBy(p => p.Id))
-        {
-            var lastOrderId = lastOrder.Id;
-            var productId = product.Id;
-            var productAmount = customer.Cart.Select(p => p.Id == product.Id).Count();
-            await orderRepo.AddToProductOrders(new ProductsOrders
-            {
-                ProductId = productId,
-                OrderId = lastOrderId,
-                Amount = productAmount,
-                
-            });
-            
-        }
-        customer.Orders.Add(lastOrder.Id);
-        
-        
-        
-
-        //TODO Hämta Metoden ClearCustomerCart och använd den här för att tömma kundvagnen efter att ordern är skapad.
-        
-        
-        return order;
-        
-
+        return Results.Ok("Order Created");
     }
 
-    private static async Task<IResult> UpdateCustomerInfo(ICustomerService<Customer> customerRepo, int userId, [FromBody] ContactInfo contactInfo)
+    private static async Task<IResult> UpdateCustomerInfo(ICustomerService<Customer> customerRepo, int userId,
+        IContactInfoService<ContactInfo> contactRepo, [FromBody] ContactInfo contactInfo)
     {
         var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
         {
             return Results.NotFound($"The customer with id {userId} could not be found");
-            
-        }
 
-        customer.ContactInfo = contactInfo;
-         return Results.Ok("Contact info are now updated");
+        }
+        var contactInfoId = customer.ContactInfo.Id;
+
+      
+        await contactRepo.UpdateAsync(contactInfoId, contactInfo);
+        return Results.Ok("Contact info are now updated");
     }
 
     private static async Task<IResult> UpdateCustomerPassword(ICustomerService<Customer> customerRepo, int userId, string newPassword)
@@ -147,50 +106,5 @@ public static class CustomerInteractionEndpoints
         customer.Password = newPassword;
          return Results.Ok("Password updated");
     }
-
-    private static async Task<IResult> ClearCustomerCart(ICustomerService<Customer> customerRepo, int userId)
-    {
-        var customer = await customerRepo.GetByIdAsync(userId);
-        if (customer is null)
-        {
-            return Results.NotFound($"The customer with id {userId} could not be found");
-            
-        }
-
-        customer.Cart.Clear();
-         return Results.Ok("Customer cart are now empty.");
-    }
-
-    private static async Task<IResult> AddProductToCustomerCart(ICustomerService<Customer> customerRepo, IProductService<Product> productRepo, int userId, int productId)
-    {
-        var customer =  await customerRepo.GetByIdAsync(userId);
-        if (customer is null)
-        {
-            return Results.NotFound($"The customer with id {userId} could not be found");
-            
-        }
-
-        var product = await productRepo.GetByIdAsync(productId);
-
-        customer.Cart.Add(product);
-        return Results.Ok();
-    }
-
-    private static async Task<IResult> RemoveProductFromCustomerCart(ICustomerService<Customer> customerRepo, IProductService<Product> productRepo, int userId, int productId)
-    {
-        var customer = await customerRepo.GetByIdAsync(userId);
-        if (customer is null)
-        {
-            return Results.NotFound($"The customer with id {userId} could not be found");
-            
-        }
-
-        var product = await productRepo.GetByIdAsync(productId);
-
-        customer.Cart.Remove(product);
-         return Results.Ok();
-    }
-
-
-
+    
 }

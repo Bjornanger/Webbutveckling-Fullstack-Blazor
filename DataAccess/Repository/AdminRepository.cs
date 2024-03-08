@@ -1,4 +1,5 @@
-﻿using webbutveckling_labb2_Bjornanger.Shared;
+﻿using Microsoft.EntityFrameworkCore;
+using webbutveckling_labb2_Bjornanger.Shared;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;

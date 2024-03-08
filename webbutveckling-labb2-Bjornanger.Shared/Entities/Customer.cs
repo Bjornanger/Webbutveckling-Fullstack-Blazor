@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace webbutveckling_labb2_Bjornanger.Shared.Entities;
 
@@ -12,10 +13,6 @@ public class Customer : User
     [Required]
 
     public ContactInfo ContactInfo { get; set; }
-
-    public virtual List<int> Orders { get; set; } = new();
-    public virtual List<Product> Cart { get; set; } = new();
-
-    
-   
+    [JsonIgnore]
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }

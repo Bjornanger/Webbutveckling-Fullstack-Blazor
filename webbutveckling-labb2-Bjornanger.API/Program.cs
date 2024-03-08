@@ -18,8 +18,11 @@ builder.Services.AddDbContext<GroceryStoreDbContext>(
 builder.Services.AddScoped<IAdminService<Admin>, AdminRepository>();
 builder.Services.AddScoped<ICategoryService<Category>, CategoryRepository>();
 builder.Services.AddScoped<ICustomerService<Customer>, CustomerRepository>();
+builder.Services.AddScoped<IContactInfoService<ContactInfo>, ContactInfoRepository>();
 builder.Services.AddScoped<IOrderService<Order>, OrderRepository>();
 builder.Services.AddScoped<IProductService<Product>, ProductRepository>();
+
+
 
 
 
@@ -29,7 +32,6 @@ var app = builder.Build();
 
 app.MapProductEndpointExtensions();
 app.MapCategoryEndpoints();
-
 app.MapCustomerInteractionEndpoints();
 app.MapUserEndpointExtensions();
 

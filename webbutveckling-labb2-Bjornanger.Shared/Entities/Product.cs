@@ -17,7 +17,7 @@ public class Product
 
     public Category Category { get; set; }
 
-    public bool Status { get; set; } 
+    public bool Status { get; set; } = true;
     [Url] 
     public string ImageUrl { get; set; } // = "../image" - Kolla upp i Labb2 Databaser.Lägg till en default bild
     public int Stock { get; set; }

@@ -11,11 +11,8 @@ public class Order
 
     public double TotalPrice { get; set; }
 
-    public int CustomerId { get; set; }
-    public virtual List<Product> ProductsInOrder { get; set; }
-
+    public Customer Customer { get; set; }
     public bool Status { get; set; } // Sätta 0, 1 till status - mottagen / skickad
-
     public virtual ICollection<ProductsOrders> ProductOrders { get; set; }
 
 }

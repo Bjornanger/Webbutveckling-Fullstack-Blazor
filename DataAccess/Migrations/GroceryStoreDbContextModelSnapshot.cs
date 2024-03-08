@@ -22,7 +22,7 @@ namespace DataAccess.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DataAccess.Entities.Category", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -39,7 +39,7 @@ namespace DataAccess.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.ContactInfo", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.ContactInfo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -76,7 +76,7 @@ namespace DataAccess.Migrations
                     b.ToTable("ContactInfos");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Order", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -98,10 +98,12 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CustomerId");
+
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Product", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -110,9 +112,6 @@ namespace DataAccess.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CustomerId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -127,9 +126,6 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int");
-
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
@@ -143,14 +139,10 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("OrderId");
-
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.ProductsOrders", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.ProductsOrders", b =>
                 {
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
@@ -171,7 +163,7 @@ namespace DataAccess.Migrations
                     b.ToTable("ProductOrders");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.User", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -201,9 +193,9 @@ namespace DataAccess.Migrations
                     b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Admin", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Admin", b =>
                 {
-                    b.HasBaseType("DataAccess.Entities.User");
+                    b.HasBaseType("webbutveckling_labb2_Bjornanger.Shared.Entities.User");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -212,9 +204,9 @@ namespace DataAccess.Migrations
                     b.HasDiscriminator().HasValue("Admin");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Customer", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Customer", b =>
                 {
-                    b.HasBaseType("DataAccess.Entities.User");
+                    b.HasBaseType("webbutveckling_labb2_Bjornanger.Shared.Entities.User");
 
                     b.Property<int>("ContactInfoId")
                         .HasColumnType("int");
@@ -227,43 +219,42 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Orders")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasIndex("ContactInfoId");
 
                     b.HasDiscriminator().HasValue("Customer");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Product", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Order", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Category", "Category")
-                        .WithMany("ProductInCatagory")
+                    b.HasOne("webbutveckling_labb2_Bjornanger.Shared.Entities.Customer", "Customer")
+                        .WithMany("Orders")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Product", b =>
+                {
+                    b.HasOne("webbutveckling_labb2_Bjornanger.Shared.Entities.Category", "Category")
+                        .WithMany("ProductInCategory")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DataAccess.Entities.Customer", null)
-                        .WithMany("Cart")
-                        .HasForeignKey("CustomerId");
-
-                    b.HasOne("DataAccess.Entities.Order", null)
-                        .WithMany("ProductsInOrder")
-                        .HasForeignKey("OrderId");
-
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.ProductsOrders", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.ProductsOrders", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Order", "Order")
+                    b.HasOne("webbutveckling_labb2_Bjornanger.Shared.Entities.Order", "Order")
                         .WithMany("ProductOrders")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DataAccess.Entities.Product", "Product")
+                    b.HasOne("webbutveckling_labb2_Bjornanger.Shared.Entities.Product", "Product")
                         .WithMany("ProductOrders")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -274,9 +265,9 @@ namespace DataAccess.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Customer", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Customer", b =>
                 {
-                    b.HasOne("DataAccess.Entities.ContactInfo", "ContactInfo")
+                    b.HasOne("webbutveckling_labb2_Bjornanger.Shared.Entities.ContactInfo", "ContactInfo")
                         .WithMany()
                         .HasForeignKey("ContactInfoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -285,26 +276,24 @@ namespace DataAccess.Migrations
                     b.Navigation("ContactInfo");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Category", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Category", b =>
                 {
-                    b.Navigation("ProductInCatagory");
+                    b.Navigation("ProductInCategory");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Order", b =>
-                {
-                    b.Navigation("ProductOrders");
-
-                    b.Navigation("ProductsInOrder");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Product", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Order", b =>
                 {
                     b.Navigation("ProductOrders");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Customer", b =>
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Product", b =>
                 {
-                    b.Navigation("Cart");
+                    b.Navigation("ProductOrders");
+                });
+
+            modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Customer", b =>
+                {
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

@@ -16,62 +16,60 @@ public static class ProductEndpointExtensions
         group.MapGet("/category/{category}", GetProductsByCategory);
 
         group.MapPost("/", AddProduct);
-
         group.MapPatch("/{id}", UpdateProduct);
+        group.MapPatch("/status/{id}", UpdateStatusOnProduct);
+
         group.MapDelete("/{id}", DeleteProduct);
 
         return app;
     }
 
+    private static async Task<IResult> UpdateStatusOnProduct(IProductService<Product> productRepo, int prodId)
+    {
+        var prod = await productRepo.GetByIdAsync(prodId);
+        if (prod is null)
+        {
+            return Results.NotFound($"The product with id {prodId} could not be found");
+        }
+
+        prod.Status = !prod.Status;
+        
+        await productRepo.UpdateAsync(prod, prodId);
+
+        return Results.Ok($"{prod.Status}");
+
+
+    }
+
     private static async Task<IResult> DeleteProduct(IProductService<Product> repository, int id)
     {
 
-        //TODO: Kontroll på att lagerstatus återställs om en produkt tas bort
+        
         var product = await repository.GetByIdAsync(id);
         if (product is null)
         {
             return Results.NotFound($"The product with id {id} could not be found");
             
         }
-        
-        
         await repository.DeleteAsync(product.Id);
         return Results.Ok("Product deleted successfully");
     }
 
     private static async Task<IResult> UpdateProduct(IProductService<Product> productRepo, ICategoryService<Category> categoryRepo, Product product, int id)
     {
-
-        //TODO: Göra så att man hittar category id för att lägga in detta i producten och skriva ut vilket category-name den tillhör.
-       
         var prod = await productRepo.GetByIdAsync(id);
         if (prod is null)
         {
             return Results.BadRequest($"The product with id {id} could not be found");
             
         }
-        
-        prod.Name = product.Name;
-        prod.Description = product.Description;
-        prod.Price = product.Price;
 
-        if (product.Category is not null)
+        if (prod.Category.Id == null)
         {
-            var existingCategory = await categoryRepo.GetByIdAsync(product.Category.Id);
-            if (existingCategory is null)
-            {
-                return Results.BadRequest($"The category with id: {product.Category.Id} and Name:{product.Category.Name} does not exist");
-            }
-
-            prod.Category.Id = existingCategory.Id;
-
-
+            return Results.NotFound($"The product category {prod.Category.Id} is not found.");
         }
 
-        
-        prod.ImageUrl = product.ImageUrl;
-
-        await productRepo.UpdateAsync(prod);
+        await productRepo.UpdateAsync(product, id);
         return Results.Ok();
     }
 
