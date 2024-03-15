@@ -54,7 +54,7 @@
 
 <EditForm Model="categoryToAdd" FormName="CreatingCategory" OnValidSubmit="AddCategory">
     <InputText id="categoryName" @bind-Value="categoryToAdd.Name" placeholder="New Category"></InputText>
-    <Button type="submit">Create Category</Button>
+    <button type="submit">Create Category</button>
 
 </EditForm>
 
@@ -71,36 +71,56 @@
 }
 
 
-<h3>Product Inventory</h3>
-<thead>
-<Virtualize Items="productToShow">
-    <tr>
-        <td>Product: @context.Name</td>
-        <td>About: @context.Description</td>
-        <td>$$@context.Price</td>
-        <td>Amount: @context.Stock</td>
-        <td>Category: @CategoryToShow.Find(c => c.Id == @context.Category).Name</td> @*Översätter id till name *@
-        <td><img src="@context.ImageUrl" alt="Product Image" width="100" height="100"></td>
-    </tr>
-</Virtualize>
-</thead>
-@* <ul>
-    <Virtualize Items="productToShow">
-        <li>
-            <p>Product: @context.Name</p>
-            <p>About: @context.Description</p>
-            <p>$$@context.Price</p>
-            <p>Amount: @context.Stock</p>
-            <p>Category: @context.Category</p>
-            <p><img src="@context.ImageUrl" alt="Product Image" width="100" height="100"></p>
-        </li>
-    </Virtualize>
-</ul> *@
+<h3 class="row justify-content-center">Product Inventory</h3>
+
+
+<div class="container">
+    <div class="row justify-content-md-start">
+        <div class="col-md-12">
+
+            <Virtualize Items="productToShow">
+                <thead>
+                    <tr>
+                        <td>Product: @context.Name</td>
+                        <td> Description: @context.Description</td>
+                        <td> Price $@context.Price</td>
+                        <td> Amount: @context.Stock</td>
+                        <td> Category: @CategoryToShow.Find(c => c.Id == @context.Category).Name</td> @*Översätter id till name *@
+                        <td> <img src="@context.ImageUrl" alt="Product Image" width="100" height="100" /></td>
+                    </tr>
+                </thead>
+            </Virtualize>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
 
 
 
 
 @code {
+    protected override async Task OnInitializedAsync()
+    {
+        productToShow.AddRange(await adminService.GetAllAsync());
+        CategoryToShow.AddRange(await adminCategory.GetAllAsync());
+    }
+
+    private async void AddCategory()
+    {
+        await adminCategory.AddAsync(categoryToAdd);
+        CategoryToShow.Clear();
+        CategoryToShow.AddRange(await adminCategory.GetAllAsync());
+    }
+
+    
 
     //Allt med filuppladdning att göra
     private long maxFileSize = 1024 * 1024 * 3;//filstorlek till max 3MB
@@ -178,24 +198,15 @@
     //Allt som har med prtodukter att göra
     private ProductDTO newProduct { get; set; } = new ProductDTO();
     private List<ProductDTO> productToShow { get; set; } = new List<ProductDTO>();
+    
+
+
 
     //Allt med kategorier att göra
     private CategoryDTO categoryToRemove { get; set; } = new CategoryDTO();
     private CategoryDTO categoryToAdd { get; set; } = new CategoryDTO();
     private List<CategoryDTO> CategoryToShow { get; set; } = new List<CategoryDTO>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        productToShow.AddRange(await adminService.GetAllAsync());
-        CategoryToShow.AddRange(await adminCategory.GetAllAsync());
-    }
-
-    private async void AddCategory()
-    {
-        await adminCategory.AddAsync(categoryToAdd);
-        CategoryToShow.Clear();
-        CategoryToShow.AddRange(await adminCategory.GetAllAsync());
-    }
 
 
 

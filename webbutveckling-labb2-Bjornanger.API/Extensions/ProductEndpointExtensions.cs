@@ -161,7 +161,7 @@ public static class ProductEndpointExtensions
         return products;
     }
 
-    private static async Task<Product> GetProductByName(IProductService<Product> repository, string name)
+    private static async Task<ProductDTO> GetProductByName(IProductService<ProductDTO> repository, string name)
     {
         var productName = await repository.GetProductByNameAsync(name.ToLower());
         
@@ -189,10 +189,15 @@ public static class ProductEndpointExtensions
         return product;
     }
 
-    private static async Task<List<ProductDTO>> GetAllProducts(IProductService<Product> repository)
+    private static async Task<List<ProductDTO?>> GetAllProducts(IProductService<Product> repository)
     {
 
         var products = await repository.GetAllAsync();
+
+        if (products is null)
+        {
+            return null;
+        }
 
         var prodList = products.ToList();
 

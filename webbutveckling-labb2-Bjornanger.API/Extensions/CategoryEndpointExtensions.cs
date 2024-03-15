@@ -57,7 +57,7 @@ public static class CategoryEndpointExtensions
     {
         var categories = await repository.GetAllAsync();
 
-        if (categories.Count() <= 0)
+        if (categories is null)
         {
             Results.NotFound("No categories found");
         }
