@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using webbutveckling_labb2_Bjornanger.Shared.DTOs;
 using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
@@ -8,12 +9,10 @@ public static class CustomerInteractionEndpoints
 {
     public static IEndpointRouteBuilder MapCustomerInteractionEndpoints(this IEndpointRouteBuilder app)
     {
-        //TODO: Lägg till endpoint i planeringen
-
         var group = app.MapGroup("api/customer");
 
-        group.MapGet("/order/{userId}", GetOrderFromCustomer);//ny lägg till i planeringen
-        group.MapPost("/{userId}", CreateCustomerOrder);// ny lägg till i planeringen
+        group.MapGet("/order/{userId}", GetOrderFromCustomer);
+        group.MapPost("/{userId}", CreateCustomerOrder);
         group.MapPatch("/{userId}", UpdateCustomerInfo);
         group.MapPatch("/password/{userId}/{newPassword}", UpdateCustomerPassword);
 

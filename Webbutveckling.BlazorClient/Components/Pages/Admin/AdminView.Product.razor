@@ -1,0 +1,202 @@
+﻿@page "/AdminView_Product"
+@using webbutveckling_labb2_Bjornanger.Shared.Interfaces
+@using webbutveckling_labb2_Bjornanger.Shared.DTOs
+@using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs
+@using System.Text.Json
+@using System.ComponentModel
+@using System.Data
+@using System.Xml.XPath
+@inject IProductService<ProductDTO> adminService
+@inject ICategoryService<CategoryDTO> adminCategory
+@inject IConfiguration config
+
+@rendermode InteractiveServer
+
+<h3>Admin Product Inventory</h3>
+
+
+
+<EditForm Model="newProduct" OnValidSubmit="SubmitForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label for="productName">Product Name:</label>
+        <InputText id="productname" class="form-control" @bind-Value="newProduct.Name" placeholder="Product name" />
+    </div>
+    <div>
+        <label for="productDescription">Product Description:</label>
+        <InputText id="productdescription" class="form-control" @bind-Value="newProduct.Description" placeholder="Description" />
+    </div>
+    <div>
+        <label for="productName">Product Price:</label>
+        <InputNumber id="productprice" class="form-control" @bind-Value="newProduct.Price" placeholder="Price of product"></InputNumber>
+    </div>
+    <div>
+        <label for="productName">Product Stock:</label>
+        <InputNumber id="productstock" class="form-control" @bind-Value="newProduct.Stock" placeholder="Create stock"></InputNumber>
+    </div>
+    <label>Set Category for Product:</label>
+    <InputSelect @bind-Value="newProduct.Category" placeholder="Set Category to Product">
+        <option value=""></option>
+        @foreach (var category in CategoryToShow)
+        {
+            <option value="@category.Id">@category.Name</option>
+        }
+    </InputSelect>
+    <div>
+        <label for="productPicture"></label>
+        <InputFile OnChange="@LoadFiles" accept=".png, .jpg, .jpeg" class="form-control" placeholder="Upload picture to your product"></InputFile>
+    </div>
+    <button class="btn btn-success" type="submit">Create Product</button>"
+</EditForm>
+
+
+
+<EditForm Model="categoryToAdd" FormName="CreatingCategory" OnValidSubmit="AddCategory">
+    <InputText id="categoryName" @bind-Value="categoryToAdd.Name" placeholder="New Category"></InputText>
+    <Button type="submit">Create Category</Button>
+
+</EditForm>
+
+
+@if (errorList.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class="text-danger">
+        @foreach (var error in errorList)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+
+
+<h3>Product Inventory</h3>
+<thead>
+<Virtualize Items="productToShow">
+    <tr>
+        <td>Product: @context.Name</td>
+        <td>About: @context.Description</td>
+        <td>$$@context.Price</td>
+        <td>Amount: @context.Stock</td>
+        <td>Category: @CategoryToShow.Find(c => c.Id == @context.Category).Name</td> @*Översätter id till name *@
+        <td><img src="@context.ImageUrl" alt="Product Image" width="100" height="100"></td>
+    </tr>
+</Virtualize>
+</thead>
+@* <ul>
+    <Virtualize Items="productToShow">
+        <li>
+            <p>Product: @context.Name</p>
+            <p>About: @context.Description</p>
+            <p>$$@context.Price</p>
+            <p>Amount: @context.Stock</p>
+            <p>Category: @context.Category</p>
+            <p><img src="@context.ImageUrl" alt="Product Image" width="100" height="100"></p>
+        </li>
+    </Virtualize>
+</ul> *@
+
+
+
+
+@code {
+
+    //Allt med filuppladdning att göra
+    private long maxFileSize = 1024 * 1024 * 3;//filstorlek till max 3MB
+    private int maxAllowedFiles = 1;//max antal filer som kan laddas upp
+    private List<string> errorList = new List<string>();//lista för att hålla reda på felmeddelanden
+    private IBrowserFile? file;
+    private async Task SubmitForm()
+    {
+        try
+        {
+            string relativePath = await CaptureFile();
+            newProduct.ImageUrl = relativePath;
+            var jsonString = JsonSerializer.Serialize(newProduct);
+            await adminService.AddAsync(newProduct);
+            productToShow.Clear();
+            productToShow.AddRange(await adminService.GetAllAsync());
+            StateHasChanged();
+
+        }
+        catch (Exception e)
+        {
+            errorList.Add($"Error: {e.Message}");
+            throw;
+        }
+    }
+    private async Task LoadFiles(InputFileChangeEventArgs fileToUpload)//Mwetod för att ladda upp filer till mina producter
+    {
+
+        file = fileToUpload.File;
+
+    }
+    private async Task<string> CaptureFile()
+    {
+        if (file is null)
+        {
+            return "";
+        }
+
+        try
+        {
+            string newFileName = Path.ChangeExtension(
+                Path.GetRandomFileName(),
+                Path.GetExtension(file.Name));
+            string path = Path.Combine(
+                config.GetValue<string>(
+                    "FileStorage")!,
+                "bjornanger",
+                newFileName);
+
+
+            string relativePath = Path.Combine(
+                "bjornanger",
+                newFileName);
+
+
+            Directory.CreateDirectory(Path.Combine(
+                config.GetValue<string>(
+                    "FileStorage")!,
+                "bjornanger"));
+            await using FileStream fs = new(path, FileMode.Create);
+            await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+
+            return relativePath;
+
+        }
+        catch (Exception e)
+        {
+            errorList.Add($"File: {file.Name} Error: {e.Message}");
+            throw;
+        }
+
+
+    }
+
+    //Allt som har med prtodukter att göra
+    private ProductDTO newProduct { get; set; } = new ProductDTO();
+    private List<ProductDTO> productToShow { get; set; } = new List<ProductDTO>();
+
+    //Allt med kategorier att göra
+    private CategoryDTO categoryToRemove { get; set; } = new CategoryDTO();
+    private CategoryDTO categoryToAdd { get; set; } = new CategoryDTO();
+    private List<CategoryDTO> CategoryToShow { get; set; } = new List<CategoryDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        productToShow.AddRange(await adminService.GetAllAsync());
+        CategoryToShow.AddRange(await adminCategory.GetAllAsync());
+    }
+
+    private async void AddCategory()
+    {
+        await adminCategory.AddAsync(categoryToAdd);
+        CategoryToShow.Clear();
+        CategoryToShow.AddRange(await adminCategory.GetAllAsync());
+    }
+
+
+
+}

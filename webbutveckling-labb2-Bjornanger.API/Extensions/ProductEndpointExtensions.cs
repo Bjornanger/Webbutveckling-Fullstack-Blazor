@@ -1,4 +1,5 @@
-﻿using webbutveckling_labb2_Bjornanger.Shared.Entities;
+﻿using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs;
+using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 namespace webbutveckling_labb2_Bjornanger.API.Extensions;
@@ -74,28 +75,56 @@ public static class ProductEndpointExtensions
     }
 
 
-    private static async Task<IResult> AddProduct(IProductService<Product> repository, Product product)
+    private static async Task<IResult> AddProduct(IProductService<Product> repository,ICategoryService<Category> categoryRepo, ProductDTO productDto)
     {
-        //TODO: Kontroll på att lagerstatus inte är 0 eller mindre
-
+        if (productDto is null)
+        {
+            return null;
+        }
         var prodToAdd = await repository.GetAllAsync();
+
 
         if (prodToAdd is null)
         {
             return null;
         }
 
+        Category switchedCategory = new Category();
 
-        if(prodToAdd
+        var newCategory = await categoryRepo.GetByIdAsync(productDto.Category);
+
+
+        if (newCategory is null)
+        {
+            return Results.NotFound($"Category with {newCategory.Id} not found");
+        }
+
+
+        switchedCategory = newCategory;
+
+        
+        Product product = new Product()
+        {
+            Name = productDto.Name,
+            Description = productDto.Description,
+            Price = productDto.Price,
+            ImageUrl = productDto.ImageUrl,
+            Category = switchedCategory,
+            Stock = productDto.Stock,
+            Status = productDto.Status
+        };
+
+        
+
+        if (prodToAdd
            .ToList().Any(p => p.Name.ToLower() == product.Name.ToLower()))
         {
             return Results.BadRequest($"The product with name {product.Name} already exists");
            
         }
 
-        
         await repository.AddAsync(product);
-         return Results.Ok($"{product.Name} added");
+        return Results.Ok($"{product.Name} added");
 
     }
 
@@ -160,23 +189,21 @@ public static class ProductEndpointExtensions
         return product;
     }
 
-    private static async Task<List<Product>> GetAllProducts(IProductService<Product> repository)
+    private static async Task<List<ProductDTO>> GetAllProducts(IProductService<Product> repository)
     {
 
         var products = await repository.GetAllAsync();
 
         var prodList = products.ToList();
 
-        if (prodList.Count() <= 0)
+        if (prodList.Count <= 0 )//TODO: Något blir fel i databasen här 12/3
         {
             Results.NotFound("No products in list");
             return null;
         }
 
-        //fixa så att hela produkten skrivs ut i console/postman
-       
 
-        Results.Ok();
-         return prodList.ToList();
+        Results.Ok("Product list found");
+        return prodList.Select(p=>new ProductDTO(){Category = p.Category.Id, Name = p.Name, Description = p.Description, Price = p.Price, ImageUrl = p.ImageUrl, Status = p.Status, Stock = p.Stock}).ToList();
     }
 }

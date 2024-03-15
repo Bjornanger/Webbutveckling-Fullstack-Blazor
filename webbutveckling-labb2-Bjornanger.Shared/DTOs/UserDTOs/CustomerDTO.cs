@@ -14,5 +14,5 @@ public class CustomerDTO
     public ContactInfoDTO ContactInfo { get; set; }
 
     public virtual List<OrderDTO> Orders { get; set; } = new();
-    public virtual List<ProductDTO.ProductDTO> Cart { get; set; } = new();
+    public virtual List<ProductDTOs.ProductDTO> Cart { get; set; } = new();
 }

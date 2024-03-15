@@ -14,7 +14,6 @@ public class Product
     public double Price { get; set; }
 
     [Required]
-
     public Category Category { get; set; }
 
     public bool Status { get; set; } = true;

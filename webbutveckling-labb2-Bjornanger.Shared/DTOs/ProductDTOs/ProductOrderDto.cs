@@ -1,4 +1,4 @@
-﻿namespace webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTO;
+﻿namespace webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs;
 
 public class ProductOrderDto
 {
