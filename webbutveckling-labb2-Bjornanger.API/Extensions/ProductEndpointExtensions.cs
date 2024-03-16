@@ -56,7 +56,7 @@ public static class ProductEndpointExtensions
         return Results.Ok("Product deleted successfully");
     }
 
-    private static async Task<IResult> UpdateProduct(IProductService<Product> productRepo, ICategoryService<Category> categoryRepo, Product product, int id)
+    private static async Task<IResult> UpdateProduct(IProductService<Product> productRepo, ICategoryService<Category> categoryRepo, ProductDTO productDTO, int id)
     {
         var prod = await productRepo.GetByIdAsync(id);
         if (prod is null)
@@ -69,6 +69,33 @@ public static class ProductEndpointExtensions
         {
             return Results.NotFound($"The product category {prod.Category.Id} is not found.");
         }
+
+        Category switchedCategory = new Category();
+
+        var newCategory = await categoryRepo.GetByIdAsync(prod.Category.Id);
+
+
+        if (newCategory is null)
+        {
+            return Results.NotFound($"Category with {newCategory.Id} not found");
+        }
+
+
+        switchedCategory = newCategory;
+
+        Product product = new Product()
+        {
+            Name = productDTO.Name,
+            Description = productDTO.Description,
+            Price = productDTO.Price,
+            ImageUrl = productDTO.ImageUrl,
+            Category = switchedCategory,
+            Stock = productDTO.Stock,
+            Status = productDTO.Status
+        };
+
+
+
 
         await productRepo.UpdateAsync(product, id);
         return Results.Ok();
