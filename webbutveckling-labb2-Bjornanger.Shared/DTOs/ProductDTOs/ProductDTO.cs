@@ -24,6 +24,6 @@ public class ProductDTO
     [Range(typeof(bool), "true", "true", ErrorMessage = "Approval required.")]
     public bool Status { get; set; } = true; //Lägg in om det visar 0 skriv ut test - Out of Stock.
 
-    /*[Url]*/ public string ImageUrl { get; set; } = ".../webbutveckling-labb2-Bjornanger/webbutveckling-labb2-Bjornanger.API/ProductPictures/bjornanger/"; 
+    [Url] public string ImageUrl { get; set; } 
     public int Stock { get; set; }
 }

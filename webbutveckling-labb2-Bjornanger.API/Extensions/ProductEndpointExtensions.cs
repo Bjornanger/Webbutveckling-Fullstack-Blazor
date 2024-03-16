@@ -209,7 +209,7 @@ public static class ProductEndpointExtensions
 
         var prodList = products.Select(p => new ProductDTO
         {
-
+            Id = p.Id,
             Name = p.Name,
             Description = p.Description,
             Price = p.Price,

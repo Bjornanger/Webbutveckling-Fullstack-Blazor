@@ -13,7 +13,7 @@
 <div>
     <EditForm Model="productToFind" FormName="SearchForProd" OnValidSubmit="SearchProduct">
         <InputText type="text" @bind-Value="productToFind.Name" placeholder="Search..."></InputText>
-        <button type="submit"><i class="fa fa-search"></i></button>
+        <button class="btn btn-info" type="submit"><i class="fa fa-search"></i></button>
     </EditForm>
 </div>
 
@@ -30,11 +30,12 @@
                     <img class="card-img-top" src="@product.ImageUrl" alt="Product Image">
                     <div class="card-body">
                         <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">ID: @product.Id</p>
                         <p class="card-text">Description: @product.Description</p>
                         <p class="card-footer" Price:>@(product.Price) USD</p>
                         <p class="card-footer">Stock: @product.Stock</p>
                         <p class="card-footer">Available: @product.Status</p>
-                        <button class="btn btn-outline-danger" type="submit" @onclick="RemoveProduct">Remove</button>
+                        
                     </div>
                 </div>
             </div>
@@ -42,15 +43,22 @@
     </div>
 </div>
 
+<div class="container">
+    <EditForm Model="productToRemove" FormName="RemoveProduct" OnValidSubmit="RemoveProduct">
+        <InputNumber @bind-Value="productToRemove.Id "></InputNumber>
+        <button class="btn btn-outline-danger" type="submit">Remove Product</button>
+    </EditForm>
 
+</div>
 
 
 
 @code
 {
-    ProductDTO productToFind = new ProductDTO();
-
+    ProductDTO productToFind { get; set; } = new ProductDTO();
     List<ProductDTO> searchedProduct = new List<ProductDTO>();
+
+    ProductDTO productToRemove { get; set; }= new ProductDTO(); 
 
 
     List<ProductDTO> showAllProducts = new List<ProductDTO>();
@@ -82,22 +90,24 @@
 
     private async Task RemoveProduct()
     {
-        if (productToFind is null)
+        if (searchedProduct is null)
         {
             return;
         }
+        
+        var prodFromList = searchedProduct.FirstOrDefault(p => p.Id == productToRemove.Id);
 
+        if (prodFromList is null)
+        {
+            return;
+        }
+        
+        await adminService.DeleteAsync(prodFromList.Id);
+        
 
-
-        int prodId = productToFind.Id;
-
-        var productToRemove = await adminService.GetByIdAsync(prodId);
-
-        await adminService.DeleteAsync(productToRemove.Id);
-        showAllProducts.Remove(productToRemove);
         searchedProduct.Clear();
-       
-
+        showAllProducts.Clear();
+        showAllProducts.AddRange(await adminService.GetAllAsync());
         
 
 
