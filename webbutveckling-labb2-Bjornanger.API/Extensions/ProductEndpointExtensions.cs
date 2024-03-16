@@ -160,18 +160,26 @@ public static class ProductEndpointExtensions
         return products;
     }
 
-    private static async Task<ProductDTO> GetProductByName(IProductService<ProductDTO> repository, string name)
+    private static async Task<ProductDTO> GetProductByName(IProductService<Product> repository, string name)
     {
-        var productName = await repository.GetProductByNameAsync(name.ToLower());
 
-        if (productName is null)
+        var product = await repository.GetProductByNameAsync(name.ToLower());
+
+        if (product is null)
         {
             Results.NotFound($"The product with name {name} could not be found");
             return null;
         }
 
+        var prodToShowName = new ProductDTO
+        {
+            Name = product.Name,
+           
+        };
+
+
         Results.Ok();
-        return productName;
+        return prodToShowName;
     }
 
     private static async Task<Product?> GetProductById(IProductService<Product> repository, int id)
@@ -192,21 +200,28 @@ public static class ProductEndpointExtensions
     {
 
         var products = await repository.GetAllAsync();
-
+        
         if (products is null)
         {
+            Results.NotFound("No products");
             return null;
         }
 
-        var prodList = products.ToList();
-
-        if (prodList is null )
+        var prodList = products.Select(p => new ProductDTO
         {
-            Results.NotFound("No products in list");
-            return null;
-        }
-        
-        Results.Ok("Product list found");
-        return prodList.Select(p=>new ProductDTO(){Category = p.Category.Id, Name = p.Name, Description = p.Description, Price = p.Price, ImageUrl = p.ImageUrl, Status = p.Status, Stock = p.Stock}).ToList();
+
+            Name = p.Name,
+            Description = p.Description,
+            Price = p.Price,
+            Category = p.Category.Id,
+            Status = p.Status,
+            ImageUrl = p.ImageUrl,
+            Stock = p.Stock
+        }).ToList();
+
+       
+         Results.Ok($"{prodList}");
+         return prodList;
+       
     }
 }

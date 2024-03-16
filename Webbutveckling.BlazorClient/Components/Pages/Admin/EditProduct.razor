@@ -7,30 +7,34 @@
 
 @rendermode InteractiveServer
 
-<h3>Edit Product</h3>
+<h2>Edit Product</h2>
 
+
+<div>
+    <EditForm Model="productToFind" FormName="SearchForProd" OnValidSubmit="SearchProduct">
+        <InputText type="text" @bind-Value="productToFind.Name" placeholder="Search..."></InputText>
+        <button type="submit"><i class="fa fa-search"></i></button>
+    </EditForm>
+</div>
 
 
 <div class="container">
-    <h3>Search for Product</h3>
+    <h5>Search for Product</h5>
     <div class="input-group mb-3">
-        <EditForm Model="searchQuery" FormName="SearchProduct" OnValidSubmit="SearchForProducts">
-            <span class="input-group-text" id="searchIcon"><i class="bi bi-search"></i></span>
-            <InputText type="text" class="form-control" @bind-Value="searchQuery" placeholder="Search for products..." aria-describedby="searchIcon"></InputText>
-            <button type="submit">Search</button>
-        </EditForm>
     </div>
     <div class="row">
-        @foreach (var product in searchList)
+        @foreach (var product in searchedProduct)
         {
             <div class="col-md-4 mb-3">
                 <div class="card">
+                    <img class="card-img-top" src="@product.ImageUrl" alt="Product Image">
                     <div class="card-body">
                         <h5 class="card-title">@product.Name</h5>
-                        <p class="card-text">@product.Description</p>
-                        <p class="card-footer">@product.Price</p>
-                        <p class="card-footer">@product.Stock</p>
-                        <p class="card-footer">@product.Status</p>
+                        <p class="card-text">Description: @product.Description</p>
+                        <p class="card-footer" Price:>@(product.Price) USD</p>
+                        <p class="card-footer">Stock: @product.Stock</p>
+                        <p class="card-footer">Available: @product.Status</p>
+                        <button class="btn btn-outline-danger" type="submit" @onclick="RemoveProduct">Remove</button>
                     </div>
                 </div>
             </div>
@@ -38,15 +42,20 @@
     </div>
 </div>
 
+
+
+
+
 @code
 {
-    ProductDTO productToUpdate = new ProductDTO();
+    ProductDTO productToFind = new ProductDTO();
+
+    List<ProductDTO> searchedProduct = new List<ProductDTO>();
+
+
     List<ProductDTO> showAllProducts = new List<ProductDTO>();
 
 
-
-    string searchQuery = string.Empty;
-    private List<ProductDTO> searchList = new List<ProductDTO>();
 
     List<CategoryDTO> categoryToShow = new List<CategoryDTO>();
 
@@ -58,24 +67,39 @@
         categoryToShow.AddRange(await adminCategory.GetAllAsync());
     }
 
-    private async void SearchForProducts()
+
+    private async Task SearchProduct()
     {
-        if (searchQuery is null)
+        if (string.IsNullOrEmpty(productToFind.Name))
         {
             return;
         }
 
-        var prodName = searchQuery;
+        var prodToSee = showAllProducts.Where(p => p.Name == productToFind.Name);
 
-        if (prodName is not string)
+        searchedProduct.AddRange(prodToSee);
+    }
+
+    private async Task RemoveProduct()
+    {
+        if (productToFind is null)
         {
             return;
         }
+
+
+
+        int prodId = productToFind.Id;
+
+        var productToRemove = await adminService.GetByIdAsync(prodId);
+
+        await adminService.DeleteAsync(productToRemove.Id);
+        showAllProducts.Remove(productToRemove);
+        searchedProduct.Clear();
+       
 
         
 
+
     }
- 
-
-
 }

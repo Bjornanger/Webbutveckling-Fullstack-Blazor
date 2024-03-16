@@ -6,6 +6,7 @@
 @using System.Text.Json
 @inject IProductService<ProductDTO> adminService
 @inject ICategoryService<CategoryDTO> adminCategory
+@inject IWebHostEnvironment env
 @inject IConfiguration config
 
 @rendermode InteractiveServer
@@ -36,7 +37,7 @@
     <label>Set Category for Product:</label>
     <InputSelect @bind-Value="newProduct.Category" placeholder="Set Category to Product">
         <option value=""></option>
-        @foreach (var category in CategoryToShow)
+        @foreach (var category in categoriesFromDb)
         {
             <option value="@category.Id">@category.Name</option>
         }
@@ -48,14 +49,11 @@
     <button class="btn btn-success" type="submit">Create Product</button>"
 </EditForm>
 
-
-
 <EditForm Model="categoryToAdd" FormName="CreatingCategory" OnValidSubmit="AddCategory">
     <InputText id="categoryName" @bind-Value="categoryToAdd.Name" placeholder="New Category"></InputText>
     <button type="submit">Create Category</button>
 
 </EditForm>
-
 
 @if (errorList.Count > 0)
 {
@@ -68,11 +66,8 @@
     </ul>
 }
 
-
 <h3 class="row justify-content-center">Product Inventory</h3>
-
-
-<div class="container">
+ <div class="container">
     <div class="row justify-content-md-start">
         <div class="col-md-12">
 
@@ -83,7 +78,7 @@
                         <td> Description: @context.Description</td>
                         <td> Price $@context.Price</td>
                         <td> Amount: @context.Stock</td>
-                        <td> Category: @CategoryToShow.Find(c => c.Id == @context.Category).Name</td> @*Översätter id till name *@
+                        <td> Category: @categoriesFromDb.FirstOrDefault(c => c.Id == @context.Category).Name</td> @*Översätter id till name *@
                         <td> <img src="@context.ImageUrl" alt="Product Image" width="100" height="100" /></td>
                     </tr>
                 </thead>
@@ -91,20 +86,28 @@
 
         </div>
     </div>
-</div>
-
-
-
-
-
-
-
-
+</div> 
 
 
 
 
 @code {
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        productToShow.AddRange(await adminService.GetAllAsync());
+        categoriesFromDb.AddRange(await adminCategory.GetAllAsync());
+    }
+
+    private async void AddCategory()
+    {
+        await adminCategory.AddAsync(categoryToAdd);
+        categoriesFromDb.Clear();
+        categoriesFromDb.AddRange(await adminCategory.GetAllAsync());
+    }
 
     //Allt som har med produkter att göra
     private ProductDTO newProduct { get; set; } = new ProductDTO();
@@ -114,24 +117,9 @@
 
 
     //Allt med kategorier att göra
-    
+
     private CategoryDTO categoryToAdd { get; set; } = new CategoryDTO();
-    private List<CategoryDTO> CategoryToShow { get; set; } = new List<CategoryDTO>();
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        productToShow.AddRange(await adminService.GetAllAsync());
-        CategoryToShow.AddRange(await adminCategory.GetAllAsync());
-    }
-
-    private async void AddCategory()
-    {
-        await adminCategory.AddAsync(categoryToAdd);
-        CategoryToShow.Clear();
-        CategoryToShow.AddRange(await adminCategory.GetAllAsync());
-    }
-
+    private List<CategoryDTO> categoriesFromDb { get; set; } = new List<CategoryDTO>();
 
 
     //Allt med filuppladdning att göra
@@ -173,41 +161,39 @@
 
         try
         {
+            // Generate a unique filename
             string newFileName = Path.ChangeExtension(
                 Path.GetRandomFileName(),
                 Path.GetExtension(file.Name));
-            string path = Path.Combine(
-                config.GetValue<string>(
-                    "FileStorage")!,
-                "bjornanger",
+
+            // Construct the absolute path where the file will be stored
+            string absolutePath = Path.Combine(
+                env.WebRootPath,
+                "images",
                 newFileName);
 
-
+            // Construct the relative path
             string relativePath = Path.Combine(
-                "bjornanger",
+                "images",
                 newFileName);
 
+            // Ensure the directory exists
+            Directory.CreateDirectory(Path.GetDirectoryName(absolutePath));
 
-            Directory.CreateDirectory(Path.Combine(
-                config.GetValue<string>(
-                    "FileStorage")!,
-                "bjornanger"));
-            await using FileStream fs = new(path, FileMode.Create);
+            // Save the file
+            await using FileStream fs = new(absolutePath, FileMode.Create);
             await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
 
             return relativePath;
-
         }
         catch (Exception e)
         {
             errorList.Add($"File: {file.Name} Error: {e.Message}");
             throw;
         }
-
-
     }
 
-    
+
 
 
 

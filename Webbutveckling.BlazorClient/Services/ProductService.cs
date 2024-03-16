@@ -24,7 +24,7 @@ public class ProductService : IProductService<ProductDTO>
     public async Task<IEnumerable<ProductDTO?>> GetAllAsync()
     {
         var allProducts = await _httpClient.GetFromJsonAsync<IEnumerable<ProductDTO>>("api/products");
-        return allProducts;
+        return await Task.FromResult(allProducts);
 
     }
 
