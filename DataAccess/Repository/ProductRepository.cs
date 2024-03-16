@@ -59,10 +59,10 @@ public class ProductRepository : IProductService<Product>
     }
 
 
-    public async Task<Product?> GetProductByNameAsync(string name)
+    public async Task<Product> GetProductByNameAsync(string name)
     {
         return await _context.Products
-            .Include(p => p.Category)
+            
             .FirstOrDefaultAsync(x => x.Name.ToLower()
                 .Equals(name.ToLower()));
     }

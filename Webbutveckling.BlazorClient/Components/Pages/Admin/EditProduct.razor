@@ -1,0 +1,81 @@
+﻿@page "/EditProduct"
+@using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs
+@using webbutveckling_labb2_Bjornanger.Shared.Interfaces
+@using webbutveckling_labb2_Bjornanger.Shared.DTOs
+@inject IProductService<ProductDTO> adminService
+@inject ICategoryService<CategoryDTO> adminCategory
+
+@rendermode InteractiveServer
+
+<h3>Edit Product</h3>
+
+
+
+<div class="container">
+    <h3>Search for Product</h3>
+    <div class="input-group mb-3">
+        <EditForm Model="searchQuery" FormName="SearchProduct" OnValidSubmit="SearchForProducts">
+            <span class="input-group-text" id="searchIcon"><i class="bi bi-search"></i></span>
+            <InputText type="text" class="form-control" @bind-Value="searchQuery" placeholder="Search for products..." aria-describedby="searchIcon"></InputText>
+            <button type="submit">Search</button>
+        </EditForm>
+    </div>
+    <div class="row">
+        @foreach (var product in searchList)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">@product.Description</p>
+                        <p class="card-footer">@product.Price</p>
+                        <p class="card-footer">@product.Stock</p>
+                        <p class="card-footer">@product.Status</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code
+{
+    ProductDTO productToUpdate = new ProductDTO();
+    List<ProductDTO> showAllProducts = new List<ProductDTO>();
+
+
+
+    string searchQuery = string.Empty;
+    private List<ProductDTO> searchList = new List<ProductDTO>();
+
+    List<CategoryDTO> categoryToShow = new List<CategoryDTO>();
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        showAllProducts.AddRange(await adminService.GetAllAsync());
+        categoryToShow.AddRange(await adminCategory.GetAllAsync());
+    }
+
+    private async void SearchForProducts()
+    {
+        if (searchQuery is null)
+        {
+            return;
+        }
+
+        var prodName = searchQuery;
+
+        if (prodName is not string)
+        {
+            return;
+        }
+
+        
+
+    }
+ 
+
+
+}

@@ -1,4 +1,5 @@
-﻿using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs;
+﻿using Microsoft.AspNetCore.Mvc;
+using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 namespace Webbutveckling.BlazorClient.Services;
@@ -23,7 +24,7 @@ public class ProductService : IProductService<ProductDTO>
     public async Task<IEnumerable<ProductDTO?>> GetAllAsync()
     {
         var allProducts = await _httpClient.GetFromJsonAsync<IEnumerable<ProductDTO>>("api/products");
-        return await Task.FromResult(allProducts);
+        return allProducts;
 
     }
 

@@ -101,7 +101,6 @@ public static class ProductEndpointExtensions
 
 
         switchedCategory = newCategory;
-
         
         Product product = new Product()
         {
@@ -164,7 +163,7 @@ public static class ProductEndpointExtensions
     private static async Task<ProductDTO> GetProductByName(IProductService<ProductDTO> repository, string name)
     {
         var productName = await repository.GetProductByNameAsync(name.ToLower());
-        
+
         if (productName is null)
         {
             Results.NotFound($"The product with name {name} could not be found");
@@ -188,8 +187,8 @@ public static class ProductEndpointExtensions
         Results.Ok();
         return product;
     }
-
-    private static async Task<List<ProductDTO?>> GetAllProducts(IProductService<Product> repository)
+    
+    private static async Task<List<ProductDTO>> GetAllProducts(IProductService<Product> repository)
     {
 
         var products = await repository.GetAllAsync();
@@ -201,13 +200,12 @@ public static class ProductEndpointExtensions
 
         var prodList = products.ToList();
 
-        if (prodList.Count <= 0 )//TODO: Något blir fel i databasen här 12/3
+        if (prodList is null )
         {
             Results.NotFound("No products in list");
             return null;
         }
-
-
+        
         Results.Ok("Product list found");
         return prodList.Select(p=>new ProductDTO(){Category = p.Category.Id, Name = p.Name, Description = p.Description, Price = p.Price, ImageUrl = p.ImageUrl, Status = p.Status, Stock = p.Stock}).ToList();
     }

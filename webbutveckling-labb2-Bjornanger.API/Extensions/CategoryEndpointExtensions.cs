@@ -28,13 +28,8 @@ public static class CategoryEndpointExtensions
             return Results.NotFound($"The category with id {id} could not be found");
             
         }
-
-
         await categoryRepo.DeleteAsync(findCategoryToDelete.Id);
         return Results.Ok("Category deleted successfully");
-        
-
-
     }
 
     private static async Task<IResult> AddCategory(ICategoryService<Category> repository, Category category)

@@ -16,8 +16,8 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Components\Pages\AdminView.Product.razor" />
-    <_ContentIncludedByDefault Remove="Components\Pages\Admin\AdminView.Customer.razor" />
-    <_ContentIncludedByDefault Remove="Components\Pages\Admin\AdminView_EditProduct.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Admin\CreateProduct.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Admin\EditProduct.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,15 +25,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <UpToDateCheckInput Remove="Components\Pages\Admin\AdminView.Customer.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BootstrapBlazor" Version="8.3.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <UpToDateCheckInput Remove="Components\Pages\Admin\AdminView_EditProduct.razor" />
+    <UpToDateCheckInput Remove="Components\Pages\Admin\CreateProduct.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Pages\Admin\EditProduct.razor" />
   </ItemGroup>
 
 </Project>

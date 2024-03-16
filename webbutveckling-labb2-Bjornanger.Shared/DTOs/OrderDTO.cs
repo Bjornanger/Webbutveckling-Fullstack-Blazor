@@ -1,4 +1,6 @@
-﻿namespace webbutveckling_labb2_Bjornanger.Shared.DTOs;
+﻿using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs;
+
+namespace webbutveckling_labb2_Bjornanger.Shared.DTOs;
 
 public class OrderDTO
 {
@@ -7,7 +9,7 @@ public class OrderDTO
     public double TotalPrice { get; set; }
 
     public int CustomerId { get; set; }
-    public virtual List<ProductDTOs.ProductDTO> ProductsInOrder { get; set; }
+    public virtual List<ProductDTO> ProductsInOrder { get; set; }
 
     public bool Status { get; set; } // Sätta 0, 1 till status - mottagen / skickad
 }

@@ -1,11 +1,9 @@
-﻿@page "/AdminView_Product"
+﻿@page "/CreateProduct"
+
 @using webbutveckling_labb2_Bjornanger.Shared.Interfaces
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs
 @using System.Text.Json
-@using System.ComponentModel
-@using System.Data
-@using System.Xml.XPath
 @inject IProductService<ProductDTO> adminService
 @inject ICategoryService<CategoryDTO> adminCategory
 @inject IConfiguration config
@@ -107,6 +105,20 @@
 
 
 @code {
+
+    //Allt som har med produkter att göra
+    private ProductDTO newProduct { get; set; } = new ProductDTO();
+    private List<ProductDTO> productToShow { get; set; } = new List<ProductDTO>();
+
+
+
+
+    //Allt med kategorier att göra
+    
+    private CategoryDTO categoryToAdd { get; set; } = new CategoryDTO();
+    private List<CategoryDTO> CategoryToShow { get; set; } = new List<CategoryDTO>();
+
+
     protected override async Task OnInitializedAsync()
     {
         productToShow.AddRange(await adminService.GetAllAsync());
@@ -120,7 +132,7 @@
         CategoryToShow.AddRange(await adminCategory.GetAllAsync());
     }
 
-    
+
 
     //Allt med filuppladdning att göra
     private long maxFileSize = 1024 * 1024 * 3;//filstorlek till max 3MB
@@ -195,17 +207,7 @@
 
     }
 
-    //Allt som har med prtodukter att göra
-    private ProductDTO newProduct { get; set; } = new ProductDTO();
-    private List<ProductDTO> productToShow { get; set; } = new List<ProductDTO>();
     
-
-
-
-    //Allt med kategorier att göra
-    private CategoryDTO categoryToRemove { get; set; } = new CategoryDTO();
-    private CategoryDTO categoryToAdd { get; set; } = new CategoryDTO();
-    private List<CategoryDTO> CategoryToShow { get; set; } = new List<CategoryDTO>();
 
 
 
