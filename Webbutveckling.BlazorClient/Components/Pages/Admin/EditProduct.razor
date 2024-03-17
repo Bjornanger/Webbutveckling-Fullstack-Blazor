@@ -2,25 +2,28 @@
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs
 @using webbutveckling_labb2_Bjornanger.Shared.Interfaces
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs
+@using BootstrapBlazor.Components
 @inject IProductService<ProductDTO> adminService
 @inject ICategoryService<CategoryDTO> adminCategory
 
 @rendermode InteractiveServer
 
+<h2>Admin Edit Product</h2>
+<br />
 
-<div class="container">
+    <div class="container">
     <div class="row">
-        <h2>Edit Product</h2>
         <div>
+            <h3>Search for Product</h3>
             <EditForm Model="productToFind" FormName="SearchForProd" OnValidSubmit="SearchProduct">
                 <InputText type="text" @bind-Value="productToFind.Name" placeholder="Search..."></InputText>
                 <button class="btn btn-info" type="submit"><i class="fa fa-search"></i></button>
             </EditForm>
         </div>
         <div class="col-md-6">
-            <h3>Search for Product</h3>
+
             <div class="container">
-                <h5>Search for Product</h5>
+
                 <div class="input-group mb-3">
                 </div>
                 <div class="row">
@@ -36,7 +39,7 @@
                                     <p class="card-footer" Price:>@(product.Price) USD</p>
                                     <p class="card-footer">Stock: @product.Stock</p>
                                     <p class="card-footer">Available: @product.Status</p>
-                        
+
                                 </div>
                             </div>
                         </div>
@@ -44,34 +47,58 @@
                 </div>
             </div>
         </div>
-        <label>Search for product to Update</label>
-        <EditForm Model="productToFindandUpdate" FormName="SearchForProdToUpdate" OnValidSubmit="SearchProductToUpdate">
-            <InputText type="text" @bind-Value="productToFindandUpdate.Name" placeholder="Search..."></InputText>
-            <button class="btn btn-info" type="submit"><i class="fa fa-search"></i></button>
-        </EditForm>
-        <div class="col-md-6">
-            <h3>Update Product</h3>
-            <div class="container">
-                <label>Choose which field to update</label>
-                <EditForm Model="productToFindandUpdate" FormName="UpådateProduct" OnValidSubmit="UpdateProduct">
-                    <InputText id="prodName" @bind-Value="productToFindandUpdate.Name" placeholder="Update Name"></InputText>
-                    <InputText id="prodDescription" @bind-Value="productToFindandUpdate.Description" placeholder="Update Description"></InputText>
-                    <InputNumber id="prodPrice" @bind-Value="productToFindandUpdate.Price" placeholder="Update price">Update Price</InputNumber>
-                    <InputNumber id="prodStock" @bind-Value="productToFindandUpdate.Stock" placeholder="Update stock">Update Stock</InputNumber>
-                    <InputSelect @bind-Value="productToFindandUpdate.Category" placeholder="Set Category to Product">
-                        New Category
-                        <option value=""></option>
-                        @foreach (var category in categoryToShow)
-                        {
-                            <option value="@category.Id">@category.Name</option>
-                        }
-                    </InputSelect>
-                    <button class="btn btn-outline-success" type="submit">Update</button>
-                </EditForm>
-            </div>
+        <br />
+
+
+    </div>
+
+
+   
+
+
+    <h3>Update Product</h3>
+    <label>Search for product to Update</label>
+    <EditForm Model="productToFindandUpdate" FormName="SearchForProdToUpdate" OnValidSubmit="SearchProductToUpdate">
+        <InputText type="text" @bind-Value="productToFindandUpdate.Name" placeholder="Search..."></InputText>
+        <button class="btn btn-info" type="submit"><i class="fa fa-search"></i></button>
+    </EditForm>
+    <div class="col-md-6">
+
+        <div class="container">
+            <h5>Choose which field to update</h5>
+            <EditForm Model="productToUpdate" FormName="UpdateProduct" OnValidSubmit="UpdateProduct">
+                <label>New name for product:</label><InputText id="prodName" @bind-Value="productToUpdate.Name" placeholder="Update Name"></InputText>
+                <br />
+                <label>New description for product:</label><InputText id="prodDescription" @bind-Value="productToUpdate.Description" placeholder="Update Description"></InputText>
+                <br />
+                <label>New price for product:</label><InputNumber id="prodPrice" @bind-Value="productToUpdate.Price" placeholder="Update price">Update Price</InputNumber>
+                <br />
+                <label>Change stock amount for product:</label><InputNumber id="prodStock" @bind-Value="productToUpdate.Stock" placeholder="Update stock">Update Stock</InputNumber>
+                <br />
+                <label>Change category for product:</label><InputSelect @bind-Value="productToUpdate.Category" placeholder="Set Category to Product">
+                    New Category
+                    <option value=""></option>
+                    @foreach (var category in categoryToShow)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </InputSelect>
+                <br />
+                <button class="btn btn-outline-success" type="submit">Update</button>
+            </EditForm>
+            <EditForm Model="productToFindandUpdate" FormName="ChangeStatus" OnValidSubmit="ChangeStatus">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="availabilitySwitch" @bind="productToUpdate.Status" />
+                    <label class="form-check-label" for="availabilitySwitch">@GetStatusLabel()</label>
+                    <br/>
+                    <button class="btn btn-outline-success" type="submit">Change Status</button>
+                </div>
+
+            </EditForm>
         </div>
     </div>
 </div>
+
 
 
 <div class="container">
@@ -94,10 +121,10 @@
     ProductDTO productToFindandUpdate { get; set; } = new ProductDTO();
     ProductDTO productToUpdate { get; set; } = new ProductDTO();
     List<ProductDTO> searchedProductToUpdate = new List<ProductDTO>();
-    
+
     ProductDTO productToFind { get; set; } = new ProductDTO();
     List<ProductDTO> searchedProduct = new List<ProductDTO>();
-    ProductDTO productToRemove { get; set; }= new ProductDTO(); 
+    ProductDTO productToRemove { get; set; } = new ProductDTO();
 
 
     List<ProductDTO> showAllProducts = new List<ProductDTO>();
@@ -120,7 +147,7 @@
         }
 
         var prodToSee = showAllProducts.Where(p => p.Name == productToFind.Name);
-
+        
         searchedProduct.AddRange(prodToSee);
     }
 
@@ -130,21 +157,21 @@
         {
             return;
         }
-        
+
         var prodFromList = searchedProduct.FirstOrDefault(p => p.Id == productToRemove.Id);
 
         if (prodFromList is null)
         {
             return;
         }
-        
+
         await adminService.DeleteAsync(prodFromList.Id);
-        
+
 
         searchedProduct.Clear();
         showAllProducts.Clear();
         showAllProducts.AddRange(await adminService.GetAllAsync());
-        
+
 
 
     }
@@ -157,10 +184,9 @@
         }
 
         var findProdInDB = adminService.GetByIdAsync(productToFindandUpdate.Id);
-
-
-        ProductDTO prodToShow = await adminService.UpdateAsync(productToFindandUpdate, findProdInDB.Id);
         
+        ProductDTO prodToShow = await adminService.UpdateAsync(productToFindandUpdate, findProdInDB.Id);
+
         searchedProductToUpdate.Clear();
         searchedProductToUpdate.Add(prodToShow);
     }
@@ -176,4 +202,21 @@
 
         searchedProductToUpdate.AddRange(prodToSee);
     }
+
+    private async Task ChangeStatus()
+    {
+        if (productToFindandUpdate.Id == null)
+        {
+            return;
+        }
+        await adminService.UpdateStatusOnProductAsync(productToFindandUpdate.Id);
+
+    }
+
+    private string GetStatusLabel()
+    {
+        return productToFindandUpdate.Status ? "In stock" : "Out of stock";
+    }
 }
+
+

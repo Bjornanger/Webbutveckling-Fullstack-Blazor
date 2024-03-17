@@ -58,6 +58,12 @@ public class ProductRepository : IProductService<Product>
        return prodToUpdate;
     }
 
+    public async Task<Product> UpdateStatusOnProductAsync(int prodId)
+    {
+        return await _context.Products.FirstOrDefaultAsync(p => p.Id == prodId);
+        
+    }
+
 
     public async Task<Product> GetProductByNameAsync(string name)
     {

@@ -25,7 +25,9 @@ public static class ProductEndpointExtensions
         return app;
     }
 
-    private static async Task<IResult> UpdateStatusOnProduct(IProductService<Product> productRepo, int prodId)
+   
+
+private static async Task<IResult> UpdateStatusOnProduct(IProductService<Product> productRepo, int prodId)
     {
         var prod = await productRepo.GetByIdAsync(prodId);
         if (prod is null)

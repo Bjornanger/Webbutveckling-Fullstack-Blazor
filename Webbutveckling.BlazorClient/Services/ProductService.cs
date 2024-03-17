@@ -36,6 +36,12 @@ public class ProductService : IProductService<ProductDTO>
         return await Task.FromResult(entity);
     }
 
+    public async Task<ProductDTO> UpdateStatusOnProductAsync(int prodId)
+    {
+        var productStatusToChange = await _httpClient.GetFromJsonAsync<ProductDTO>($"api/products/status/{prodId}");
+        return await Task.FromResult(productStatusToChange);
+    }
+
     public async Task<ProductDTO> GetProductByNameAsync(string name)
     {
         var productToShow = await _httpClient.GetFromJsonAsync<ProductDTO>($"api/products/name/{name}");
