@@ -12,8 +12,6 @@ public class ContactInfoRepository : IContactInfoService<ContactInfo>
         _context = context;
     }
     
-        
-    
 
     public async Task<IEnumerable<ContactInfo>> GetAllAsync()
     {
@@ -30,17 +28,10 @@ public class ContactInfoRepository : IContactInfoService<ContactInfo>
         await _context.ContactInfos.AddAsync(contactInfo);
         await _context.SaveChangesAsync();
     }
-
-    public async Task DeleteAsync(int id)
-    {
-        var contactInfoToDelete = await _context.Customers.FindAsync(id);
-        _context.Customers.Remove(contactInfoToDelete);
-        await _context.SaveChangesAsync();
-    }
-
+    
    
 
-    public async Task<ContactInfo> UpdateAsync(int id, ContactInfo contactInfo)
+    public async Task<ContactInfo> UpdateCustomerInfo(int id, ContactInfo contactInfo)
     {
         var contactInfoToUpdate = await _context.ContactInfos.FindAsync(id);
 
@@ -57,4 +48,5 @@ public class ContactInfoRepository : IContactInfoService<ContactInfo>
         await _context.SaveChangesAsync();
         return contactInfoToUpdate;
     }
+
 }

@@ -70,8 +70,10 @@ public class CustomerRepository : ICustomerService<Customer>
 
     public async Task<IEnumerable<Customer>> GetAllAsync()
     {
+        
         return _context.Customers
-            .Include(c => c.ContactInfo).Include(c => c.Orders);
+            .Include(c => c.ContactInfo)
+            .Include(c => c.Orders);
     }
 
     public async Task<Customer?> GetByIdAsync(int id)
@@ -95,26 +97,41 @@ public class CustomerRepository : ICustomerService<Customer>
         await _context.SaveChangesAsync();
     }
 
-    public async Task<Customer> UpdateAsync(Customer customer, int userId)
+    //public async Task<Customer> UpdateAsync(Customer customer, int userId)
+    //{
+    //    var customerToUpdate = await _context.Customers.Include(c => c.ContactInfo)
+    //        .FirstOrDefaultAsync(c => c.Id == userId);
+    //    if (customerToUpdate is null)
+    //    {
+    //        return null;
+    //    }
+
+    //    customerToUpdate.FirstName = customer.FirstName;
+    //    customerToUpdate.LastName = customer.LastName;  
+    //    customerToUpdate.Email = customer.Email;
+    //    customerToUpdate.Password = customer.Password;
+
+    //    await _context.SaveChangesAsync();
+    //    return customerToUpdate;
+    //}
+
+    //public void Save()
+    //{
+    //    _context.SaveChanges();
+    //}
+  
+
+    public async Task UpdateCustomerPasswordAsync(int id, string newPassword)//TODO kolla om detta fungerar
     {
-        var customerToUpdate = await _context.Customers.Include(c => c.ContactInfo)
-            .FirstOrDefaultAsync(c => c.Id == userId);
-        if (customerToUpdate is null)
+        var customer = _context.Customers.FindAsync(id);
+        var user = new User
         {
-            return null;
-        }
+            Password = newPassword
+        };
 
-        customerToUpdate.FirstName = customer.FirstName;
-        customerToUpdate.LastName = customer.LastName;  
-        customerToUpdate.Email = customer.Email;
-        customerToUpdate.Password = customer.Password;
 
+        
+        _context.Users.Update(user);
         await _context.SaveChangesAsync();
-        return customerToUpdate;
-    }
-
-    public void Save()
-    {
-        _context.SaveChanges();
     }
 }

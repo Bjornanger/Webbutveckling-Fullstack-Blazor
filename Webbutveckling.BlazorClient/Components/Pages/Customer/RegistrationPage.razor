@@ -1,0 +1,139 @@
+﻿@page "/RegistrationPage"
+@using webbutveckling_labb2_Bjornanger.Shared.Interfaces
+@using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs
+@inject ICustomerService<CustomerDTO> customerService
+@inject IContactInfoService<ContactInfoDTO> contactInfoService
+@* @inject ICustomerService<UserDTO> userService *@
+
+@rendermode InteractiveServer
+
+
+
+<h3>Registration</h3>
+
+<EditForm Model="newCustomerToAdd" FormName="CreateCustomer" OnValidSubmit="CreateNewCustomer">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <label for="firstName" class="form-label">Firstname </label>
+    <InputText id="firstName" class=" form-control" @bind-Value="newCustomerToAdd.FirstName" placeholder="Enter Firstname"></InputText>
+    <br>
+    <label for="lastName" class="form-label">Lastname </label>
+    <InputText id="lastName" class=" form-control" @bind-Value="newCustomerToAdd.LastName" placeholder="Enter Lastname"></InputText>
+    <br>
+    <label for="email" class="form-label">Email </label>
+    <InputText id="email" class=" form-control" @bind-Value="newCustomerToAdd.Login.Email" placeholder="Enter Email"></InputText>
+    <br>
+    <label for="password" class="form-label">Password </label>
+    <InputText id="password" class=" form-control" @bind-Value="newCustomerToAdd.Login.Password" placeholder="Enter Password"></InputText>
+    <br>
+    <label for="phoneNumber" class="form-label">Phone number </label>
+    <InputText id="phoneNumber" class=" form-control" @bind-Value="newCustomerToAdd.ContactInfo.Phone" placeholder="Enter Phonenumber"></InputText>
+    <br>
+    <label for="address" class="form-label">Address </label>
+    <InputText id="address" class=" form-control" @bind-Value="newCustomerToAdd.ContactInfo.Address" placeholder="Enter Address"></InputText>
+    <br>
+    <label for="city" class="form-label">City </label>
+    <InputText id="city" class=" form-control" @bind-Value="newCustomerToAdd.ContactInfo.City" placeholder="Enter City"></InputText>
+    <br>
+    <label for="zipCode" class="form-label">Zip code </label>
+    <InputText id="zipCode" class=" form-control" @bind-Value="newCustomerToAdd.ContactInfo.ZipCode" placeholder="Enter ZipCode"></InputText>
+    <br>
+    <label for="country" class="form-label">Country </label>
+    <InputText id="country" class=" form-control" @bind-Value="newCustomerToAdd.ContactInfo.Country" placeholder="Enter Country"></InputText>
+    <br>
+    <button type="submit" class="btn btn-primary">Create</button>
+    <br>
+</EditForm>
+
+@* 
+@if (customerList.Count > 0)
+{
+    <h3>Customers</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>ZipCode</th>
+                <th>Country</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in customerList)
+            {
+                <tr>
+                    <td>@customer.FirstName</td>
+                    <td>@customer.LastName</td>
+                    <td>@customer.Login.Email</td>
+                    <td>@customer.Login.Password</td>
+                    <td>@customer.ContactInfo.Phone</td>
+                    <td>@customer.ContactInfo.Address</td>
+                    <td>@customer.ContactInfo.City</td>
+                    <td>@customer.ContactInfo.Region</td>
+                    <td>@customer.ContactInfo.ZipCode</td>
+                    <td>@customer.ContactInfo.Country</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+} *@
+
+
+
+@code {
+
+    CustomerDTO newCustomerToAdd { get; set; } = new CustomerDTO();
+    List<CustomerDTO> customerList = new List<CustomerDTO>();
+
+   protected override async Task OnInitializedAsync()
+    {
+        customerList.AddRange(await customerService.GetAllAsync());
+    }
+
+
+    private async void CreateNewCustomer()
+    {
+
+        var customerFaL = newCustomerToAdd;
+
+        if (customerFaL is null)
+        {
+            return;
+        }
+       
+
+
+        
+        var createNewCustomer = new CustomerDTO
+            {
+
+                FirstName = customerFaL.FirstName,
+                LastName = customerFaL.LastName,
+                Login = new UserDTO
+                {
+                    Email = customerFaL.Login.Email,
+                    Password = customerFaL.Login.Password
+                },
+                ContactInfo = new ContactInfoDTO
+                {
+                    Phone = customerFaL.ContactInfo.Phone,
+                    Address = customerFaL.ContactInfo.Address,
+                    ZipCode = customerFaL.ContactInfo.ZipCode,
+                    City = customerFaL.ContactInfo.City,
+                    Region = customerFaL.ContactInfo.Region,
+                    Country = customerFaL.ContactInfo.Country
+                }
+            };
+            
+        customerService.AddAsync(createNewCustomer);
+        customerList.Clear();
+       customerList.AddRange(await customerService.GetAllAsync());
+        
+
+    }
+
+} 

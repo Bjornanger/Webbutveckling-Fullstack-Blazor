@@ -32,7 +32,7 @@ public class ProductService : IProductService<ProductDTO>
 
     public async Task<ProductDTO> UpdateAsync(ProductDTO entity, int id)
     {
-        var productToUpdate = await _httpClient.PutAsJsonAsync($"api/products/{id}", entity);
+        await _httpClient.PutAsJsonAsync($"api/products/{id}", entity);
         return await Task.FromResult(entity);
     }
 
@@ -64,7 +64,7 @@ public class ProductService : IProductService<ProductDTO>
 
     public async Task DeleteAsync(int id)//TODO: Fixa så att det går att ta bort en produkt ur lista i Front och i databasen.
     {
-        var productToRemove = await _httpClient.DeleteAsync($"api/products/{id}");
+        await _httpClient.DeleteAsync($"api/products/{id}");
     }
 
 

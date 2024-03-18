@@ -2,6 +2,7 @@ using Webbutveckling.BlazorClient.Components;
 using Webbutveckling.BlazorClient.Services;
 using webbutveckling_labb2_Bjornanger.Shared.DTOs;
 using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs;
+using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,8 +20,11 @@ builder.Services.AddScoped<IProductService<ProductDTO>, ProductService>();//Enda
 
 builder.Services.AddScoped<ICategoryService<CategoryDTO>, CategoryService>();//Endast för att hantera kategorier i affären
 
+builder.Services.AddScoped<ICustomerService<CustomerDTO>, CustomerService>();
 
+builder.Services.AddScoped<IContactInfoService<ContactInfoDTO>, ContactInfoService>();
 
+//builder.Services.AddScoped<ICustomerService<UserDTO>, UserService>();
 
 
 var app = builder.Build();

@@ -4,6 +4,7 @@ namespace webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs;
 
 public class ContactInfoDTO
 {
+    public int Id { get; set; }
     [Required]
     [Phone]
     public string Phone { get; set; }

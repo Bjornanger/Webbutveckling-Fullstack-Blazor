@@ -1,4 +1,5 @@
-﻿using webbutveckling_labb2_Bjornanger.Shared.Entities;
+﻿using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs;
+using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 namespace webbutveckling_labb2_Bjornanger.API.Extensions;
@@ -38,8 +39,7 @@ public static class UserEndpointExtensions
         Results.Ok();
         return allAdmins.ToList();
     }
-
-
+    
     private static async Task<IResult> AddNewAdmin(IAdminService<Admin> adminRepo, Admin newAdmin)
     {
         var newAdminToAdd = await adminRepo.GetAllAsync();
@@ -55,7 +55,6 @@ public static class UserEndpointExtensions
 
 
     }
-
     private static async Task<IResult> DeleteCustomer(ICustomerService<Customer> customerRepo, int userId)
     {
         var userToRemove = await customerRepo.GetByIdAsync(userId);
@@ -70,18 +69,47 @@ public static class UserEndpointExtensions
         return Results.Ok($"User: {userToRemove.Id} {userToRemove.FirstName} found and Removed.");
     }
     
-    private static async Task<IResult> AddNewCustomer(ICustomerService<Customer> customerRepo, Customer newCustomer)
+    private static async Task<IResult> AddNewCustomer(ICustomerService<Customer> customerRepo, CustomerDTO newCustomer)
     {
-        var customerToAdd = await customerRepo.GetAllAsync();
+        //Här klagar den på mina parametrar från RegistrationPage. Skickar in en CustomerDTO hit som AddAsync vill.
 
+        //, UserDTO userEoP, ContactInfoDTO contactInfoToAdd lägg upp i parametrarna.
 
-        if (customerToAdd.ToList().Any(p => p.Id == newCustomer.Id))
+        if (newCustomer is null)
         {
-            return Results.BadRequest($"The Customer with this Email: {newCustomer.Id} already exists");
-           
+            return null;
         }
         
-        await customerRepo.AddAsync(newCustomer);
+        var customerToAdd = await customerRepo.GetAllAsync();
+
+        if (customerToAdd.ToList().Any(p => p.Email == newCustomer.Email) || customerToAdd is null)
+        {
+            return Results.BadRequest($"The Customer with Email: {newCustomer.Email} already exists");
+           
+        }
+
+        //User user = new User()
+        //{
+        //    Email = newCustomer.Login.Email,
+        //    Password = newCustomer.Login.Password
+        //};
+
+        Customer createNewCustomer = new Customer()
+        {
+            FirstName = newCustomer.FirstName,
+            LastName = newCustomer.LastName,
+            Email = newCustomer.Email,
+            Password = newCustomer.Password,
+            ContactInfo = new ContactInfo()
+            {
+                Address = newCustomer.ContactInfo.Address,
+                City = newCustomer.ContactInfo.City,
+                ZipCode = newCustomer.ContactInfo.ZipCode,
+                Country = newCustomer.ContactInfo.Country
+            }
+        };
+        
+        await customerRepo.AddAsync(createNewCustomer);
         return Results.Ok("Customer added");
 
     }
@@ -115,18 +143,43 @@ public static class UserEndpointExtensions
         Results.Ok();
         return userById;
     }
-    
-    private static async Task<List<Customer>> GetAllCustomers(ICustomerService<Customer> customerRepo)
+
+    private static async Task<List<CustomerDTO>> GetAllCustomers(ICustomerService<Customer> customerRepo)
     {
         var allCustomers = await customerRepo.GetAllAsync();
 
         if (allCustomers is null)
         {
+            Results.NotFound("No products");
             return null;
         }
 
-        Results.Ok();
-        return allCustomers.ToList();
+
+        var customerList = allCustomers
+            .Select(c => new CustomerDTO
+            {
+                Id = c.Id,
+                FirstName = c.FirstName,
+                LastName = c.LastName,
+                Email = c.Email,
+                Password = c.Password,
+                ContactInfo = new ContactInfoDTO
+                {
+                    Phone = c.ContactInfo.Phone,
+                    Address = c.ContactInfo.Address,
+                    ZipCode = c.ContactInfo.ZipCode,
+                    City = c.ContactInfo.ZipCode,
+                    Region = c.ContactInfo.Region,
+                    Country = c.ContactInfo.Country
+                },
+                Orders = null,
+                Cart = null
+            }).ToList();
+
+
+        Results.Ok("Customer do exist.");
+        return customerList.ToList();
     }
+
 
 }

@@ -1,6 +1,8 @@
 ﻿namespace webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
-public interface IContactInfoService<T> : IService<T> where T : class
+public interface IContactInfoService<T> 
 {
-    Task<T> UpdateAsync(int id, T entity);
+    Task<T> UpdateCustomerInfo(int id, T entity);
+    
+    
 }

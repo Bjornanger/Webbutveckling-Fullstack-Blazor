@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using webbutveckling_labb2_Bjornanger.Shared.DTOs;
+using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs;
 using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
@@ -19,8 +20,8 @@ public static class CustomerInteractionEndpoints
         return app;
     }
 
-
-    private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> orderRepo,ICustomerService<Customer> customerRepo, int userId)
+   
+private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> orderRepo,ICustomerService<Customer> customerRepo, int userId)
     {
 
        var orders = await orderRepo.GetAllAsync();
@@ -88,12 +89,12 @@ public static class CustomerInteractionEndpoints
         }
         var contactInfoId = customer.ContactInfo.Id;
 
-      
-        await contactRepo.UpdateAsync(contactInfoId, contactInfo);
+
+        await contactRepo.UpdateCustomerInfo(contactInfoId, contactInfo);
         return Results.Ok("Contact info are now updated");
     }
 
-    private static async Task<IResult> UpdateCustomerPassword(ICustomerService<Customer> customerRepo, int userId, string newPassword)
+    private static async Task<IResult> UpdateCustomerPassword(ICustomerService<UserDTO> customerRepo, int userId, string newPassword)
     {
         var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)
@@ -103,6 +104,7 @@ public static class CustomerInteractionEndpoints
         }
 
         customer.Password = newPassword;
+        await customerRepo.UpdateCustomerPasswordAsync(userId, newPassword);
          return Results.Ok("Password updated");
     }
     
