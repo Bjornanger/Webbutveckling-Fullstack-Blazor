@@ -11,7 +11,7 @@
 <h2>Admin Edit Product</h2>
 <br />
 
-    <div class="container">
+<div class="container">
     <div class="row">
         <div>
             <h3>Search for Product</h3>
@@ -48,34 +48,43 @@
             </div>
         </div>
         <br />
+    </div>
 
-
+    <div class="container">
+        <label>Remove product from database</label>
+        <EditForm Model="productToRemove" FormName="RemoveProduct" OnValidSubmit="RemoveProduct">
+            <InputNumber @bind-Value="productToRemove.Id " placeholder="Remove product from Database"></InputNumber>
+            <button class="btn btn-outline-danger" type="submit">Remove Product</button>
+        </EditForm>
     </div>
 
 
-   
+
 
 
     <h3>Update Product</h3>
-    <label>Search for product to Update</label>
-    <EditForm Model="productToFindandUpdate" FormName="SearchForProdToUpdate" OnValidSubmit="SearchProductToUpdate">
-        <InputText type="text" @bind-Value="productToFindandUpdate.Name" placeholder="Search..."></InputText>
-        <button class="btn btn-info" type="submit"><i class="fa fa-search"></i></button>
-    </EditForm>
-    <div class="col-md-6">
+   
+  
 
+    <div class="col-md-6">
         <div class="container">
             <h5>Choose which field to update</h5>
             <EditForm Model="productToUpdate" FormName="UpdateProduct" OnValidSubmit="UpdateProduct">
+                <label>Search for product to Update</label>
+                <InputText type="text" @bind-Value="searchProduct" placeholder="Search..." />
+                <button class="btn btn-primary" @onclick="SearchProductToUpdate">Search</button>
+                <br/>
+                <label>ID on Product to change:</label><InputNumber id="prodId" @bind-Value="productToUpdate.Id" readonly/>
                 <label>New name for product:</label><InputText id="prodName" @bind-Value="productToUpdate.Name" placeholder="Update Name"></InputText>
-                <br />
+                <br/>
                 <label>New description for product:</label><InputText id="prodDescription" @bind-Value="productToUpdate.Description" placeholder="Update Description"></InputText>
-                <br />
+                <br/>
                 <label>New price for product:</label><InputNumber id="prodPrice" @bind-Value="productToUpdate.Price" placeholder="Update price">Update Price</InputNumber>
-                <br />
+                <br/>
                 <label>Change stock amount for product:</label><InputNumber id="prodStock" @bind-Value="productToUpdate.Stock" placeholder="Update stock">Update Stock</InputNumber>
-                <br />
-                <label>Change category for product:</label><InputSelect @bind-Value="productToUpdate.Category" placeholder="Set Category to Product">
+                <br/>
+                <label>Change category for product:</label>
+                <InputSelect @bind-Value="productToUpdate.Category" placeholder="Set Category to Product">
                     New Category
                     <option value=""></option>
                     @foreach (var category in categoryToShow)
@@ -83,14 +92,14 @@
                         <option value="@category.Id">@category.Name</option>
                     }
                 </InputSelect>
-                <br />
+                <br/>
                 <button class="btn btn-outline-success" type="submit">Update</button>
             </EditForm>
             <EditForm Model="productToFindandUpdate" FormName="ChangeStatus" OnValidSubmit="ChangeStatus">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="availabilitySwitch" @bind="productToUpdate.Status" />
                     <label class="form-check-label" for="availabilitySwitch">@GetStatusLabel()</label>
-                    <br/>
+                    <br />
                     <button class="btn btn-outline-success" type="submit">Change Status</button>
                 </div>
 
@@ -101,13 +110,7 @@
 
 
 
-<div class="container">
-    <label>Remove product from database</label>
-    <EditForm Model="productToRemove" FormName="RemoveProduct" OnValidSubmit="RemoveProduct">
-        <InputNumber @bind-Value="productToRemove.Id " placeholder="Remove product from Database"></InputNumber>
-        <button class="btn btn-outline-danger" type="submit">Remove Product</button>
-    </EditForm>
-</div>
+
 
 
 
@@ -121,6 +124,9 @@
     ProductDTO productToFindandUpdate { get; set; } = new ProductDTO();
     ProductDTO productToUpdate { get; set; } = new ProductDTO();
     List<ProductDTO> searchedProductToUpdate = new List<ProductDTO>();
+    string searchProduct;
+
+
 
     ProductDTO productToFind { get; set; } = new ProductDTO();
     List<ProductDTO> searchedProduct = new List<ProductDTO>();
@@ -147,7 +153,8 @@
         }
 
         var prodToSee = showAllProducts.Where(p => p.Name == productToFind.Name);
-        
+
+
         searchedProduct.AddRange(prodToSee);
     }
 
@@ -178,29 +185,28 @@
 
     private async Task UpdateProduct()
     {
-        if (productToFindandUpdate is null)
+        if (productToUpdate is null)
         {
             return;
         }
-
-        var findProdInDB = adminService.GetByIdAsync(productToFindandUpdate.Id);
         
-        ProductDTO prodToShow = await adminService.UpdateAsync(productToFindandUpdate, findProdInDB.Id);
+        var findProdInDB = adminService.GetByIdAsync(productToUpdate.Id);
+
+        ProductDTO prodToShow = await adminService.UpdateAsync(productToUpdate, findProdInDB.Id);
 
         searchedProductToUpdate.Clear();
-        searchedProductToUpdate.Add(prodToShow);
+        showAllProducts.Add(prodToShow);
     }
 
     private async Task SearchProductToUpdate()
     {
-        if (string.IsNullOrEmpty(productToFindandUpdate.Name))
+        if (string.IsNullOrEmpty(searchProduct))
         {
             return;
         }
 
-        var prodToSee = showAllProducts.Where(p => p.Name == productToFindandUpdate.Name);
 
-        searchedProductToUpdate.AddRange(prodToSee);
+        productToUpdate = await adminService.GetProductByNameAsync(searchProduct);
     }
 
     private async Task ChangeStatus()

@@ -17,8 +17,7 @@ public class CustomerDTO
     [Required]
     public string Password { get; set; }
 
-    [Required]
-    public ContactInfoDTO ContactInfo { get; set; } //todo: cont- till int id
+    [Required] public ContactInfoDTO ContactInfo { get; set; } = new(); //todo: cont- till int id
 
     public virtual List<OrderDTO> Orders { get; set; } = new();
     public virtual List<ProductDTO> Cart { get; set; } = new();

@@ -3,7 +3,7 @@
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs
 @inject ICustomerService<CustomerDTO> customerService
 @inject IContactInfoService<ContactInfoDTO> contactInfoService
-@* @inject ICustomerService<UserDTO> userService *@
+
 
 @rendermode InteractiveServer
 
@@ -21,10 +21,10 @@
     <InputText id="lastName" class=" form-control" @bind-Value="newCustomerToAdd.LastName" placeholder="Enter Lastname"></InputText>
     <br>
     <label for="email" class="form-label">Email </label>
-    <InputText id="email" class=" form-control" @bind-Value="newCustomerToAdd.Login.Email" placeholder="Enter Email"></InputText>
+    <InputText id="email" class=" form-control" @bind-Value="newCustomerToAdd.Email" placeholder="Enter Email"></InputText>
     <br>
     <label for="password" class="form-label">Password </label>
-    <InputText id="password" class=" form-control" @bind-Value="newCustomerToAdd.Login.Password" placeholder="Enter Password"></InputText>
+    <InputText id="password" class=" form-control" @bind-Value="newCustomerToAdd.Password" placeholder="Enter Password"></InputText>
     <br>
     <label for="phoneNumber" class="form-label">Phone number </label>
     <InputText id="phoneNumber" class=" form-control" @bind-Value="newCustomerToAdd.ContactInfo.Phone" placeholder="Enter Phonenumber"></InputText>
@@ -45,7 +45,7 @@
     <br>
 </EditForm>
 
-@* 
+
 @if (customerList.Count > 0)
 {
     <h3>Customers</h3>
@@ -68,8 +68,8 @@
                 <tr>
                     <td>@customer.FirstName</td>
                     <td>@customer.LastName</td>
-                    <td>@customer.Login.Email</td>
-                    <td>@customer.Login.Password</td>
+                    <td>@customer.Email</td>
+                    <td>@customer.Password</td>
                     <td>@customer.ContactInfo.Phone</td>
                     <td>@customer.ContactInfo.Address</td>
                     <td>@customer.ContactInfo.City</td>
@@ -80,7 +80,7 @@
             }
         </tbody>
     </table>
-} *@
+}
 
 
 
@@ -89,7 +89,7 @@
     CustomerDTO newCustomerToAdd { get; set; } = new CustomerDTO();
     List<CustomerDTO> customerList = new List<CustomerDTO>();
 
-   protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         customerList.AddRange(await customerService.GetAllAsync());
     }
@@ -104,20 +104,15 @@
         {
             return;
         }
-       
-
-
         
         var createNewCustomer = new CustomerDTO
             {
 
                 FirstName = customerFaL.FirstName,
                 LastName = customerFaL.LastName,
-                Login = new UserDTO
-                {
-                    Email = customerFaL.Login.Email,
-                    Password = customerFaL.Login.Password
-                },
+                Email = customerFaL.Email,
+                Password = customerFaL.Password,
+
                 ContactInfo = new ContactInfoDTO
                 {
                     Phone = customerFaL.ContactInfo.Phone,
@@ -128,11 +123,11 @@
                     Country = customerFaL.ContactInfo.Country
                 }
             };
-            
+
         customerService.AddAsync(createNewCustomer);
         customerList.Clear();
-       customerList.AddRange(await customerService.GetAllAsync());
-        
+        customerList.AddRange(await customerService.GetAllAsync());
+
 
     }
 
