@@ -1,0 +1,15 @@
+﻿@page "/CustomerOrders"
+@using webbutveckling_labb2_Bjornanger.Shared.DTOs
+@using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs
+@using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs
+@using webbutveckling_labb2_Bjornanger.Shared.Interfaces
+@inject IOrderService<OrderDTO> orderService
+@inject ICustomerService<CustomerDTO> customerService
+@inject IProductService<ProductDTO> productService
+
+@rendermode InteractiveServer
+<h3>CustomerOrders</h3>
+
+@code {
+    
+}

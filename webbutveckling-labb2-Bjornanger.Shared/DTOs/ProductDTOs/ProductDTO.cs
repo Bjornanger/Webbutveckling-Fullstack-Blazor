@@ -17,8 +17,8 @@ public class ProductDTO
     [Required]
     [Range(1, 1000, ErrorMessage = "Price invalid (1-1000).")]
     public double Price { get; set; }
-    
-    public int Category { get; set; }
+
+    public int Category { get; set; } = 0;
 
 
     [Range(typeof(bool), "true", "true", ErrorMessage = "Approval required.")]

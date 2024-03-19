@@ -4,9 +4,7 @@ using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 namespace Webbutveckling.BlazorClient.Services;
 
-/// <summary>
-/// Här ska allt med produkters hantering till butik skötas.
-/// </summary>
+
 public class ProductService : IProductService<ProductDTO>
 {
 
@@ -39,7 +37,8 @@ public class ProductService : IProductService<ProductDTO>
     public async Task<ProductDTO> UpdateStatusOnProductAsync(int prodId)
     {
         var productStatusToChange = await _httpClient.GetFromJsonAsync<ProductDTO>($"api/products/status/{prodId}");
-        return await Task.FromResult(productStatusToChange);
+        return await Task.FromResult(productStatusToChange);//TODO: ändra till Patch och se hur det fungerar
+
     }
 
     public async Task<ProductDTO> GetProductByNameAsync(string name)

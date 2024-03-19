@@ -78,7 +78,7 @@
                         <td> Description: @context.Description</td>
                         <td> Price $@context.Price</td>
                         <td> Amount: @context.Stock</td>
-                        <td> Category: @categoriesFromDb.FirstOrDefault(c => c.Id == @context.Category).Name</td> @*Översätter id till name *@
+                        <td> Category: @categoriesFromDb.Find(c => c.Id == @context.Category).Name</td>
                         <td> <img src="@context.ImageUrl" alt="Product Image" width="100" height="100" /></td>
                     </tr>
                 </thead>
@@ -93,6 +93,16 @@
 
 @code {
 
+    //Allt som har med produkter att göra
+    private ProductDTO newProduct { get; set; } = new ProductDTO();
+    private List<ProductDTO> productToShow { get; set; } = new List<ProductDTO>();
+
+
+
+
+    //Allt med kategorier att göra
+    private CategoryDTO categoryToAdd { get; set; } = new CategoryDTO();
+    private List<CategoryDTO> categoriesFromDb { get; set; } = new List<CategoryDTO>();
 
 
 
@@ -108,21 +118,9 @@
         categoriesFromDb.Clear();
         categoriesFromDb.AddRange(await adminCategory.GetAllAsync());
     }
+    
 
-    //Allt som har med produkter att göra
-    private ProductDTO newProduct { get; set; } = new ProductDTO();
-    private List<ProductDTO> productToShow { get; set; } = new List<ProductDTO>();
-
-
-
-
-    //Allt med kategorier att göra
-
-    private CategoryDTO categoryToAdd { get; set; } = new CategoryDTO();
-    private List<CategoryDTO> categoriesFromDb { get; set; } = new List<CategoryDTO>();
-
-
-    //Allt med filuppladdning att göra
+    //Allt med filuppladdning att göra och skapa ny product
     private long maxFileSize = 1024 * 1024 * 3;//filstorlek till max 3MB
     private int maxAllowedFiles = 1;//max antal filer som kan laddas upp
     private List<string> errorList = new List<string>();//lista för att hålla reda på felmeddelanden

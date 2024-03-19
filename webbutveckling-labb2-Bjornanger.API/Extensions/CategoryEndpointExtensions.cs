@@ -1,4 +1,5 @@
-﻿using webbutveckling_labb2_Bjornanger.Shared.Entities;
+﻿using webbutveckling_labb2_Bjornanger.Shared.DTOs;
+using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
 namespace webbutveckling_labb2_Bjornanger.API.Extensions;
@@ -48,7 +49,7 @@ public static class CategoryEndpointExtensions
         
     }
 
-    private static async Task<List<Category>> GetAllCategories(ICategoryService<Category> repository)
+    private static async Task<List<CategoryDTO>> GetAllCategories(ICategoryService<Category> repository)
     {
         var categories = await repository.GetAllAsync();
 
@@ -57,8 +58,16 @@ public static class CategoryEndpointExtensions
             Results.NotFound("No categories found");
         }
 
+        var categoryList = categories.Select(c => new CategoryDTO
+        {
+            Id = c.Id,
+            Name = c.Name
+        }).ToList();
+      
+        
+
         Results.Ok("Category added");
-        return categories.ToList();
+        return categoryList;
     }
 
 }

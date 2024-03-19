@@ -1,4 +1,5 @@
-﻿using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs;
+﻿using System.Diagnostics.CodeAnalysis;
+using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs;
 using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
 
@@ -17,15 +18,15 @@ public static class ProductEndpointExtensions
         group.MapGet("/category/{category}", GetProductsByCategory);
 
         group.MapPost("/", AddProduct);
-        group.MapPatch("/{id}", UpdateProduct);
+        group.MapPut("/{id}", UpdateProduct);
         group.MapPatch("/status/{id}", UpdateStatusOnProduct);
 
         group.MapDelete("/{id}", DeleteProduct);
 
         return app;
     }
-
    
+
 
 private static async Task<IResult> UpdateStatusOnProduct(IProductService<Product> productRepo, int prodId)
     {
@@ -74,7 +75,7 @@ private static async Task<IResult> UpdateStatusOnProduct(IProductService<Product
 
         Category switchedCategory = new Category();
 
-        var newCategory = await categoryRepo.GetByIdAsync(prod.Category.Id);
+        var newCategory = await categoryRepo.GetByIdAsync(productDTO.Category);
 
 
         if (newCategory is null)
@@ -86,7 +87,7 @@ private static async Task<IResult> UpdateStatusOnProduct(IProductService<Product
         switchedCategory = newCategory;
 
         Product product = new Product()
-        {
+        {   Id = productDTO.Id,
             Name = productDTO.Name,
             Description = productDTO.Description,
             Price = productDTO.Price,
@@ -211,20 +212,37 @@ private static async Task<IResult> UpdateStatusOnProduct(IProductService<Product
         return prodToShowName;
     }
 
-    private static async Task<Product?> GetProductById(IProductService<Product> repository, int id)
+    [SuppressMessage("ReSharper.DPA", "DPA0000: DPA issues")]
+    private static async Task<ProductDTO> GetProductById(IProductService<Product> repository, int id)
     {
+
         var product = await repository.GetByIdAsync(id);
-            
+
         if (product is null)
         {
             Results.NotFound($"The product with id {id} could not be found");
             return null;
         }
 
+        var prodToFind = new ProductDTO
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            Price = product.Price,
+            Category = product.Category.Id,
+            Status = product.Status,
+            ImageUrl = product.ImageUrl,
+            Stock = product.Stock
+        };
+            
+      
+
         Results.Ok();
-        return product;
+        return prodToFind;
     }
     
+    [SuppressMessage("ReSharper.DPA", "DPA0005: Database issues")]
     private static async Task<List<ProductDTO>> GetAllProducts(IProductService<Product> repository)
     {
 

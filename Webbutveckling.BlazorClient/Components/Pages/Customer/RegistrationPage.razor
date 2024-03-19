@@ -51,35 +51,41 @@
     <h3>Customers</h3>
     <table class="table">
         <thead>
-            <tr>
-                <th>Firstname</th>
-                <th>Lastname</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Address</th>
-                <th>City</th>
-                <th>ZipCode</th>
-                <th>Country</th>
-            </tr>
+        <tr>
+            <th>Firstname</th>
+            <th>Lastname</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>Region</th>
+            <th>ZipCode</th>
+            <th>Country</th>
+        </tr>
+           
         </thead>
+       
         <tbody>
-            @foreach (var customer in customerList)
-            {
-                <tr>
-                    <td>@customer.FirstName</td>
-                    <td>@customer.LastName</td>
-                    <td>@customer.Email</td>
-                    <td>@customer.Password</td>
-                    <td>@customer.ContactInfo.Phone</td>
-                    <td>@customer.ContactInfo.Address</td>
-                    <td>@customer.ContactInfo.City</td>
-                    <td>@customer.ContactInfo.Region</td>
-                    <td>@customer.ContactInfo.ZipCode</td>
-                    <td>@customer.ContactInfo.Country</td>
-                </tr>
-            }
+        @foreach (var customer in customerList)
+        {
+            <tr>
+                <td>@customer.FirstName</td>
+                <td>@customer.LastName</td>
+                <td>@customer.Email</td>
+                <td>@customer.Password</td>
+                <td>@customer.ContactInfo.Phone</td>
+                <td>@customer.ContactInfo.Address</td>
+                <td>@customer.ContactInfo.City</td>
+                <td>@customer.ContactInfo.Region</td>
+                <td>@customer.ContactInfo.ZipCode</td>
+                <td>@customer.ContactInfo.Country</td>
+            </tr>
+        }
         </tbody>
+       
     </table>
+   
 }
 
 
