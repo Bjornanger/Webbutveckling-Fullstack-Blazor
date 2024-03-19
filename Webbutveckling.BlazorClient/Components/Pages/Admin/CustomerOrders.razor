@@ -10,6 +10,63 @@
 @rendermode InteractiveServer
 <h3>CustomerOrders</h3>
 
+
+
+
+
+@if (customerList.Count > 0)
+{
+    <h3>Customers</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Email</th>
+                <th>Password</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>Region</th>
+                <th>ZipCode</th>
+                <th>Country</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+            @foreach (var customer in customerList)
+            {
+                <tr>
+                    <td>@customer.FirstName</td>
+                    <td>@customer.LastName</td>
+                    <td>@customer.Email</td>
+                    <td>@customer.Password</td>
+                    <td>@customer.ContactInfo.Phone</td>
+                    <td>@customer.ContactInfo.Address</td>
+                    <td>@customer.ContactInfo.City</td>
+                    <td>@customer.ContactInfo.Region</td>
+                    <td>@customer.ContactInfo.ZipCode</td>
+                    <td>@customer.ContactInfo.Country</td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+}
 @code {
-    
+    List<CustomerDTO> customerList = new List<CustomerDTO>();
+    List<OrderDTO> orderList = new List<OrderDTO>();//använd denna för att visa en specifik kunds orderhistorik
+
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        customerList.AddRange(await customerService.GetAllAsync());
+        
+    }
+
+
 }

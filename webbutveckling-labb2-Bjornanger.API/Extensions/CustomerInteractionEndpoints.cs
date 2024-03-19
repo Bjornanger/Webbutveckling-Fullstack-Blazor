@@ -23,14 +23,7 @@ public static class CustomerInteractionEndpoints
    
 private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> orderRepo,ICustomerService<Customer> customerRepo, int userId)
     {
-
-       var orders = await orderRepo.GetAllAsync();
-
-        if (orders is null)
-        {
-            return Results.NotFound("No orders found");
-        }
-
+       
         var customerOrderToGet = await customerRepo.GetByIdAsync(userId);
         var customerOrders = customerOrderToGet.Orders.ToList();
         if (customerOrders is null)
@@ -42,7 +35,7 @@ private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> ord
     }
     
     private static async Task<IResult> CreateCustomerOrder(IProductService<Product> prodRepo,
-        ICustomerService<Customer> customerRepo,IOrderService<Order> orderRepo, OrderRequest request)
+        ICustomerService<Customer> customerRepo,IOrderService<Order> orderRepo, OrderDTO request)
     {
         var customer = await customerRepo.GetByIdAsync(request.CustomerId);
         if (customer is null)
@@ -94,7 +87,7 @@ private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> ord
         return Results.Ok("Contact info are now updated");
     }
 
-    private static async Task<IResult> UpdateCustomerPassword(ICustomerService<UserDTO> customerRepo, int userId, string newPassword)
+    private static async Task<IResult> UpdateCustomerPassword(ICustomerService<CustomerDTO> customerRepo, int userId, string newPassword)
     {
         var customer = await customerRepo.GetByIdAsync(userId);
         if (customer is null)

@@ -24,7 +24,7 @@ builder.Services.AddScoped<ICustomerService<CustomerDTO>, CustomerService>();
 
 builder.Services.AddScoped<IContactInfoService<ContactInfoDTO>, ContactInfoService>();
 
-//builder.Services.AddScoped<ICustomerService<UserDTO>, UserService>();
+builder.Services.AddScoped<IOrderService<OrderDTO>, OrderService>();
 
 
 var app = builder.Build();
