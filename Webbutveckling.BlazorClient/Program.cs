@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Localization;
 using Webbutveckling.BlazorClient.Components;
 using Webbutveckling.BlazorClient.Services;
 using webbutveckling_labb2_Bjornanger.Shared.DTOs;

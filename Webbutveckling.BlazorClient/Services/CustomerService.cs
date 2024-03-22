@@ -40,6 +40,12 @@ public class CustomerService : ICustomerService<CustomerDTO>
         await _httpClient.DeleteAsync($"api/users/{id}");
     }
 
+    public async Task<CustomerDTO> GetUserByEmailAsync(string email)
+    {
+        var CustomerEmail =await _httpClient.GetFromJsonAsync<CustomerDTO>($"api/users/{email}");
+        return await Task.FromResult<CustomerDTO>(CustomerEmail);
+    }
+
     public async Task UpdateCustomerPasswordAsync(int id, string newPassword)
     {
         await _httpClient.PatchAsJsonAsync($"api/customer/password/{id}", newPassword);

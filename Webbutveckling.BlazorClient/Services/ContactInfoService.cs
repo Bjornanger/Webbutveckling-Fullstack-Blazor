@@ -15,7 +15,7 @@ public class ContactInfoService : IContactInfoService<ContactInfoDTO>
 
     public async Task<ContactInfoDTO> UpdateCustomerInfo(int id, ContactInfoDTO entity)
     {
-        await _httpClient.PatchAsJsonAsync($"api/customer/{id}", entity);
+        await _httpClient.PutAsJsonAsync($"api/customer/{id}", entity);
         return await Task.FromResult(entity);
     }
 }

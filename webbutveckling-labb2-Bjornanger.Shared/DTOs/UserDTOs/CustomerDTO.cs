@@ -20,5 +20,5 @@ public class CustomerDTO
     [Required] public ContactInfoDTO ContactInfo { get; set; } = new(); //todo: cont- till int id
 
     public virtual List<OrderDTO> Orders { get; set; } = new();
-    public virtual List<ProductDTO> Cart { get; set; } = new();
+    public List<ProductDTO> Cart { get; set; } = new();
 }

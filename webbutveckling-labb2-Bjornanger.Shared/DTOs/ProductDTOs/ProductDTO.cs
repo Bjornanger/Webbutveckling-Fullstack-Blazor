@@ -21,8 +21,8 @@ public class ProductDTO
     public int Category { get; set; } = 0;
 
 
-    [Range(typeof(bool), "true", "true", ErrorMessage = "Approval required.")]
-    public bool Status { get; set; } = true; //Lägg in om det visar 0 skriv ut test - Out of Stock.
+    [Range(typeof(bool), "true", "false", ErrorMessage = "Approval required.")]
+    public bool Status { get; set; } 
 
     [Url] public string ImageUrl { get; set; } 
     public int Stock { get; set; }

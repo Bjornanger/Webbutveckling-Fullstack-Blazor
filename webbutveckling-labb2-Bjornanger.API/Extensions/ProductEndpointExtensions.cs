@@ -19,7 +19,7 @@ public static class ProductEndpointExtensions
 
         group.MapPost("/", AddProduct);
         group.MapPut("/{id}", UpdateProduct);
-        group.MapPatch("/status/{id}", UpdateStatusOnProduct);
+        group.MapPatch("/status/{id}", UpdateStatusOnProduct);////<---PATCH 
 
         group.MapDelete("/{id}", DeleteProduct);
 
@@ -28,17 +28,17 @@ public static class ProductEndpointExtensions
    
 
 
-private static async Task<IResult> UpdateStatusOnProduct(IProductService<Product> productRepo, int prodId)
+private static async Task<IResult> UpdateStatusOnProduct(IProductService<Product> productRepo, int id)
     {
-        var prod = await productRepo.GetByIdAsync(prodId);
+        var prod = await productRepo.GetByIdAsync(id);
         if (prod is null)
         {
-            return Results.NotFound($"The product with id {prodId} could not be found");
+            return Results.NotFound($"The product with id {id} could not be found");
         }
 
         prod.Status = !prod.Status;
         
-        await productRepo.UpdateAsync(prod, prodId);
+        await productRepo.UpdateAsync(prod, id);
 
         return Results.Ok($"{prod.Status}");
 

@@ -13,7 +13,7 @@ public class OrderDTO
     public virtual List<ProductDTO> ProductsInOrder { get; set; } = new List<ProductDTO>();
 
     
-    public List<ProductOrderDto> ProductOrders { get; set; }
+    public List<ProductOrderDto> ProductsAndAmount { get; set; }
 
     public bool Status { get; set; } // Sätta 0, 1 till status - mottagen / skickad
 }

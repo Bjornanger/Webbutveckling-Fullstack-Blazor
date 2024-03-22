@@ -53,6 +53,7 @@ public class ProductRepository : IProductService<Product>
        prodToUpdate.Category = prod.Category;
        prodToUpdate.ImageUrl = prod.ImageUrl;
        prodToUpdate.Stock = prod.Stock;
+       prodToUpdate.Status = prod.Status;
 
         await _context.SaveChangesAsync();
        return prodToUpdate;

@@ -12,9 +12,9 @@ public static class CustomerInteractionEndpoints
     {
         var group = app.MapGroup("api/customer");
 
-        group.MapGet("/order/{userId}", GetOrderFromCustomer);
-        group.MapPost("/{userId}", CreateCustomerOrder);
-        group.MapPatch("/{userId}", UpdateCustomerInfo);
+        group.MapGet("/order/{Id}", GetOrderFromCustomer);
+        group.MapPost("/{Id}", CreateCustomerOrder);
+        group.MapPut("/{id}", UpdateCustomerInfo);
         group.MapPatch("/password/{userId}/{newPassword}", UpdateCustomerPassword);
 
         return app;
@@ -71,13 +71,13 @@ private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> ord
         return Results.Ok("Order Created");
     }
 
-    private static async Task<IResult> UpdateCustomerInfo(ICustomerService<Customer> customerRepo, int userId,
+    private static async Task<IResult> UpdateCustomerInfo(ICustomerService<Customer> customerRepo, int id,
         IContactInfoService<ContactInfo> contactRepo, [FromBody] ContactInfo contactInfo)
     {
-        var customer = await customerRepo.GetByIdAsync(userId);
+        var customer = await customerRepo.GetByIdAsync(id);
         if (customer is null)
         {
-            return Results.NotFound($"The customer with id {userId} could not be found");
+            return Results.NotFound($"The customer with id {id} could not be found");
 
         }
         var contactInfoId = customer.ContactInfo.Id;

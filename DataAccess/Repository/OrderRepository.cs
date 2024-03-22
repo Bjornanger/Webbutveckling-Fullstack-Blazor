@@ -31,14 +31,33 @@ public class OrderRepository : IOrderService<Order>
         await _context.SaveChangesAsync();
     }
 
+    public Task<IEnumerable<Order>> GetOrderFromCustomerAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task AddToProductOrdersAsync(ProductsOrders orders)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task CreateCustomerOrderAsync(int id, Order entity)
+    {
+       var customerToAddOrderTo = await _context.Customers.FindAsync(id);
+       customerToAddOrderTo.Orders.Add(entity); 
+       await _context.SaveChangesAsync();
+    }
+
+    
+
     public async Task DeleteAsync(int id)
     {
-       var orderToDelete = await _context.Orders.FindAsync(id);
+        var orderToDelete = await _context.Orders.FindAsync(id);
         _context.Orders.Remove(orderToDelete);
         await _context.SaveChangesAsync();
     }
 
-    
+
 
     public async Task AddToProductOrders(ProductsOrders orders)
     {

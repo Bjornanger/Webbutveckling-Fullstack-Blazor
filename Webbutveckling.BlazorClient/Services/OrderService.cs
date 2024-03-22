@@ -31,10 +31,8 @@ public class OrderService : IOrderService<OrderDTO>
         throw new NotImplementedException();
     }
 
-    public async Task CreateCustomerOrderAsync(int id)
+    public async Task CreateCustomerOrderAsync(int id, OrderDTO entity)
     {
-        await _httpClient.PostAsJsonAsync($"api/customer/{id}");
+        await _httpClient.PostAsJsonAsync($"api/customer/{id}", entity);
     }
-
-  
 }

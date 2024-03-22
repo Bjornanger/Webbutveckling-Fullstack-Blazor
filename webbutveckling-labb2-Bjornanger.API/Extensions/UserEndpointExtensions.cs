@@ -71,9 +71,7 @@ public static class UserEndpointExtensions
     
     private static async Task<IResult> AddNewCustomer(ICustomerService<Customer> customerRepo, CustomerDTO newCustomer)
     {
-        //Här klagar den på mina parametrar från RegistrationPage. Skickar in en CustomerDTO hit som AddAsync vill.
-
-        //, UserDTO userEoP, ContactInfoDTO contactInfoToAdd lägg upp i parametrarna.
+       
 
         if (newCustomer is null)
         {
@@ -102,10 +100,13 @@ public static class UserEndpointExtensions
             Password = newCustomer.Password,
             ContactInfo = new ContactInfo()
             {
+                Phone = newCustomer.ContactInfo.Phone,
                 Address = newCustomer.ContactInfo.Address,
-                City = newCustomer.ContactInfo.City,
                 ZipCode = newCustomer.ContactInfo.ZipCode,
+                City = newCustomer.ContactInfo.City,
+                Region = newCustomer.ContactInfo.Region,
                 Country = newCustomer.ContactInfo.Country
+
             }
         };
         
@@ -114,7 +115,7 @@ public static class UserEndpointExtensions
 
     }
 
-    private static async Task<Customer?> GetUserByEmail(ICustomerService<Customer> customerRepo, string email)
+    private static async Task<CustomerDTO?> GetUserByEmail(ICustomerService<Customer> customerRepo, string email)
     {
         var allCustomers = await customerRepo.GetAllAsync();
 
@@ -125,8 +126,29 @@ public static class UserEndpointExtensions
             Results.NotFound($"Customer with {customerEmail}does not exist");
         }
 
+        var customerToShow = new CustomerDTO
+        {
+            Id = customerEmail.Id,
+            FirstName = customerEmail.FirstName,
+            LastName = customerEmail.LastName,
+            Email = customerEmail.Email,
+            Password = customerEmail.Password,
+            ContactInfo = new ContactInfoDTO
+            {
+                Phone = customerEmail.ContactInfo.Phone,
+                Address = customerEmail.ContactInfo.Address,
+                ZipCode = customerEmail.ContactInfo.ZipCode,
+                City = customerEmail.ContactInfo.City,
+                Region = customerEmail.ContactInfo.Region,
+                Country = customerEmail.ContactInfo.Country
+            },
+            Orders = null,
+            Cart = null
+        };
+
+
         Results.Ok("Email found");
-        return customerEmail;
+        return customerToShow;
     }
 
     private static async Task<Customer> GetUserById(ICustomerService<Customer> customerRepo, int userId)

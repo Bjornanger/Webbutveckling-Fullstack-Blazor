@@ -11,7 +11,7 @@ public interface IOrderService<T>
     Task<IEnumerable<T>> GetOrderFromCustomerAsync(int id);
     Task AddToProductOrdersAsync(ProductsOrders orders);
 
-    Task CreateCustomerOrderAsync(int id);
+    Task CreateCustomerOrderAsync(int id,T entity);
 
 
 }

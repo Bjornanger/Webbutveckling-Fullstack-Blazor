@@ -9,8 +9,81 @@
 @inject ICustomerService<CustomerDTO> customerService
 
 @rendermode InteractiveServer
-<h3>GroceryShop</h3>
+<h1>Grocery Store</h1>
+<div class="container">
+    <EditForm Model="selectedCustomer" FormName="Shopping" OnSubmit="SelectCustomer">
+        <label>Select your Shopping Profile:</label>
+        <InputSelect id="selectedCustomer" @bind-Value="selectedCustomer.Id" placeholder="Select Customer...">
+            <option value=""></option>
+            @foreach (var customer in whosShopping)
+            {
+                <option value="@customer.Id">@customer.FirstName @customer.LastName </option>
+            }
+            
 
+        </InputSelect>
+        <button class="btn btn-success" type="submit">Go and BUY STUFF!</button>
+    </EditForm>
+
+</div>
+
+
+<div class="container-sm">
+    <div class="row">
+        <div class="col-md-3">
+            <h2>Products</h2>
+            @foreach (var product in productsList)
+            {
+                <img class="card-img-top" src="@product.ImageUrl" alt="Product Image">
+                <div class="card-body">
+                    <h5 class="card-title">@product.Name</h5>
+                    <p class="card-text">Description: @product.Description</p>
+                    <p class="card-text">Price: @(product.Price) USD</p>
+                    <p class="card-text">Category: @product.Category</p>
+                    <button class="btn btn-success" @onclick="() => AddToCart(product)">Add to Cart</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+
+<hr>
+
+<h2>Shopping Cart</h2>
+<div class="row">
+    <div class="col-md-8">
+        <ul class="list-group">
+            @foreach (var item in shoppingCustomer.Cart)
+            {
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-md-6">@item.Name</div>
+                        <div class="col-md-3">$@item.Price</div>
+                        <div class="col-md-3">
+                            <button class="btn btn-danger btn-sm" @onclick="() => RemoveFromCart(item)">Remove</button>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <div>
+                    <p>@(shoppingCustomer.FirstName)</p>
+                </div>
+                <h5 class="card-title">Cart:</h5>
+                <p class="card-text">Products: @shoppingCustomer.Cart.Count</p>
+                <p class="card-text">Total Price: $</p>
+                <button class="btn btn-success" type="submit" @onclick="CreateOrder">Checkout</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -18,5 +91,79 @@
 
 
 @code {
-    
+    public CustomerDTO selectedCustomer { get; set; } = new CustomerDTO();
+    public CustomerDTO shoppingCustomer { get; set; } = new CustomerDTO();
+    public List<CustomerDTO> whosShopping { get; set; } = new List<CustomerDTO>();
+
+    public List<ProductDTO> productsList { get; set; } = new List<ProductDTO>();
+    public List<OrderDTO> orders { get; set; } = new List<OrderDTO>();
+
+
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        productsList.AddRange(await productService.GetAllAsync());
+        whosShopping.AddRange(await customerService.GetAllAsync());
+    }
+
+
+    private async Task RemoveFromCart(ProductDTO item)
+    {
+        shoppingCustomer.Cart.Remove(item);
+    }
+
+    private async Task AddToCart(ProductDTO product)
+    {
+       shoppingCustomer.Cart.Add(product);
+
+    }
+
+    private async void SelectCustomer()
+    {
+        if (selectedCustomer.Id == null)
+        {
+            return;
+        }
+
+        var shopping = whosShopping.FirstOrDefault(c => c.Id == selectedCustomer.Id);
+
+        shoppingCustomer = new CustomerDTO
+        {
+            Id = shopping.Id,
+            FirstName = shopping.FirstName,
+            LastName = shopping.LastName,
+            Cart = new List<ProductDTO>()
+        };
+
+    }
+
+    private async Task CreateOrder()
+    {
+        if (shoppingCustomer.Cart is null)
+        {
+            return;
+        }
+
+
+        var shoppingId = shoppingCustomer.Id;
+
+        var order = new OrderDTO
+        {
+            CustomerId = shoppingCustomer.Id,
+                ProductsAndAmount = 
+             
+            
+            TotalPrice = shoppingCustomer.Cart.Sum(p => p.Price)
+        };
+
+        await orderService.CreateCustomerOrderAsync(shoppingId,order);
+
+
+
+
+
+
+    }
+
 }

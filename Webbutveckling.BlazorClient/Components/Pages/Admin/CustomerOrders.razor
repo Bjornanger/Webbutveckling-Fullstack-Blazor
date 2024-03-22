@@ -8,17 +8,60 @@
 @inject IProductService<ProductDTO> productService
 
 @rendermode InteractiveServer
-<h3>CustomerOrders</h3>
+<h3>Customers Orders</h3>
+<div class="bg-danger" >
+
+
+<div class="container">
+    <div class="row">
+        <label>Select Customer:</label>
+        <EditForm Model="customerToShow" FormName="SearchCustomerOrder" OnValidSubmit="LoadCustomer">
+            <InputSelect class="form-select" id="chooseCustomer" @bind-Value="customerToShow">
+            
+            <option value="">Select customer...</option>
+            @foreach (var customer in customerList)
+            {
+                <option value="@customer">@customer.FirstName @customer.LastName</option>
+            }
+                </InputSelect>
+        </EditForm>
+        
+    </div>
+    
+    <div>
+        @if (customerToShow != null)
+        {
+            <h3>Orders for @customerToShow.FirstName</h3>
+            <ul class="list-group">
+                @foreach (var order in customerToShow.Orders)
+                {
+                    <li class="list-group-item">
+                        Order ID: @order.Id <br />
+                        Order Date: @order.OrderDate <br />
+                        Order Products: @order.ProductsInOrder <br />
+                        Order Specifics: @order.ProductOrders <br />
+                        Order Total: @order.TotalPrice <br />
+                        
+                    </li>
+                }
+
+            </ul>
+        }
+    </div>
 
 
 
+</div>
+
+<div>
+    <h3>All Customers</h3>
 
 
-@if (customerList.Count > 0)
-{
-    <h3>Customers</h3>
-    <table class="table">
-        <thead>
+    @if (customerList.Count > 0)
+    {
+        <h3>Customers</h3>
+        <table class="table">
+            <thead>
             <tr>
                 <th>Firstname</th>
                 <th>Lastname</th>
@@ -32,9 +75,9 @@
                 <th>Country</th>
             </tr>
 
-        </thead>
+            </thead>
 
-        <tbody>
+            <tbody>
             @foreach (var customer in customerList)
             {
                 <tr>
@@ -50,23 +93,36 @@
                     <td>@customer.ContactInfo.Country</td>
                 </tr>
             }
-        </tbody>
+            </tbody>
 
-    </table>
-}
+        </table>
+
+
+    }
+</div>
+
+
+</div>
 @code {
-    List<CustomerDTO> customerList = new List<CustomerDTO>();
-    List<OrderDTO> orderList = new List<OrderDTO>();//använd denna för att visa en specifik kunds orderhistorik
+
+    private CustomerDTO customerToShow { get; set; } = new();
 
 
 
+    private List<CustomerDTO> customerList = new List<CustomerDTO>();
+    
 
 
     protected override async Task OnInitializedAsync()
     {
         customerList.AddRange(await customerService.GetAllAsync());
-        
+
     }
 
+
+    private async Task LoadCustomer()
+    {
+        
+    }
 
 }

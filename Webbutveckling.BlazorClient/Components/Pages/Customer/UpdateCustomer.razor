@@ -1,0 +1,175 @@
+﻿@page "/UpdateCustomer"
+@using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs
+@using webbutveckling_labb2_Bjornanger.Shared.Interfaces
+
+@inject ICustomerService<CustomerDTO> customerService
+@inject IContactInfoService<ContactInfoDTO> contactInfoService
+
+@rendermode InteractiveServer
+
+
+<h3>Update your Contact Information:</h3>
+
+<div class="container">
+    <div class="col-md">
+        <h3>Choose your profile by Searching for you Email adress here:</h3>
+        <EditForm Model="searchCustomer" FormName="SearchCustomer" OnSubmit="SearchForCustomer">
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
+            <InputText class="form-control" @bind-Value="searchCustomer.Email" placeholder="Enter your Email"></InputText>
+            <button type="submit">Search</button>
+        </EditForm>
+    </div>
+    
+    
+    
+
+    <EditForm Model="customerToChange" FormName="UpdateCustomerInfo" OnValidSubmit="UpdateCustomerInfo">
+        <label>Firstname:</label>
+        <InputText class="form-control" id="CustomerFirstname" @bind-Value="customerToChange.FirstName" readonly></InputText><br/>
+        <label>Lastname:</label>
+        <InputText class="form-control" id="CustomerLastname" @bind-Value="customerToChange.LastName" readonly></InputText><br />
+        <label>Update your Phone number:</label>
+        <InputText class="form-control" id="" @bind-Value="customerToChange.ContactInfo.Phone">Enter New Phone Number</InputText><br />
+        <label>Update your Address:</label>
+        <InputText class="form-control" id="" @bind-Value="customerToChange.ContactInfo.Address">Enter New Address</InputText><br/>
+        <label>Update your City:</label>
+        <InputText class="form-control" id="" @bind-Value="customerToChange.ContactInfo.City">Enter New City</InputText><br />
+        <label>Update your Zip code:</label>
+        <InputText class="form-control" id="" @bind-Value="customerToChange.ContactInfo.ZipCode">Enter New Zip code</InputText><br />
+        <label>Update your Region:</label>
+        <InputText class="form-control" id="" @bind-Value="customerToChange.ContactInfo.Region">Enter New Region</InputText><br />
+        <label>Update your Country:</label>
+        <InputText class="form-control" id="" @bind-Value="customerToChange.ContactInfo.Country">Enter New Country</InputText><br />
+       
+        <button type="submit" class="btn btn-success">Update</button>
+
+    </EditForm>
+
+</div>
+
+<Container>
+    <Row>
+        <Col>
+        <h3>This is your profile:</h3>
+        <ul class="list-group">
+            @foreach (var customer in updatedCustomer)
+            {
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-md-3">Name: @customer.FirstName</div>
+                        <div class="col-md-3">Lastname: @customer.LastName</div>
+                        <div class="col-md-3">Email: @customer.Email</div>
+                        <div class="col-md-3">Password: @customer.Password</div>
+                        <div class="col-md-3">Phone: @customer.ContactInfo.Phone</div>
+                        <div class="col-md-3">Address: @customer.ContactInfo.Address</div>
+                        <div class="col-md-3">Zipcode: @customer.ContactInfo.ZipCode</div>
+                        <div class="col-md-3">City: @customer.ContactInfo.City</div>
+                        <div class="col-md-3">Region: @customer.ContactInfo.Region</div>
+                        <div class="col-md-3">Country: @customer.ContactInfo.Country</div>
+                    </div>
+                </li>
+            }
+        </ul>
+        
+    </Row>
+</Container>
+
+
+
+
+
+
+
+@code {
+
+    //public CustomerDTO customerToUpdate { get; set; } = new CustomerDTO();
+    public CustomerDTO searchCustomer { get; set; } = new CustomerDTO();
+    public ContactInfoDTO ContactInfoToUpdate { get; set; } = new ContactInfoDTO();
+
+
+    
+    public List<CustomerDTO> updatedCustomer { get; set; } = new ();
+    public List<CustomerDTO> allCustomers { get; set; } = new();
+
+
+
+
+    public CustomerDTO customerToChange { get; set; } = new CustomerDTO();
+
+
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        allCustomers.AddRange(await customerService.GetAllAsync());
+    }
+
+
+    private async Task SearchForCustomer()
+    {
+        if (string.IsNullOrEmpty(searchCustomer.Email))
+        {
+            return;
+        }
+
+       var customer = allCustomers.FirstOrDefault(c => c.Email == searchCustomer.Email);
+
+       if (customer is null)
+       {
+           return;
+       }
+
+
+       customerToChange = new CustomerDTO
+       {
+           Id = customer.Id,
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+           Email = customer.Email,
+                Password = customer.Password,
+           ContactInfo = new ContactInfoDTO
+           {
+                    Id = customer.ContactInfo.Id,
+               Phone = customer.ContactInfo.Phone,
+               Address = customer.ContactInfo.Address,
+                    ZipCode = customer.ContactInfo.ZipCode,
+               City = customer.ContactInfo.City,
+               Region = customer.ContactInfo.Region,
+               Country = customer.ContactInfo.Country
+           },
+           Orders = null,
+           Cart = null
+       };
+
+       
+
+    }
+
+    private async Task UpdateCustomerInfo()
+    {
+        if (customerToChange.Id == null)
+        {
+            return;
+        }
+        
+        var customerToUpdate = allCustomers.FirstOrDefault(c => c.Id == customerToChange.Id);
+
+        ContactInfoToUpdate = new ContactInfoDTO
+        {
+                Id = customerToChange.ContactInfo.Id,
+            Phone = customerToChange.ContactInfo.Phone,
+                Address = customerToChange.ContactInfo.Address,
+                ZipCode = customerToChange.ContactInfo.ZipCode,
+                City = customerToChange.ContactInfo.City,
+                Region = customerToChange.ContactInfo.Region,
+                Country = customerToChange.ContactInfo.Country
+        };
+
+
+        await contactInfoService.UpdateCustomerInfo(customerToUpdate.Id, ContactInfoToUpdate);
+        allCustomers.Clear();
+        allCustomers.AddRange(await customerService.GetAllAsync());
+    }
+
+}

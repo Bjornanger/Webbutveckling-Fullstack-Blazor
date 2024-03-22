@@ -34,12 +34,13 @@ public class ProductService : IProductService<ProductDTO>
         return await Task.FromResult(entity);
     }
 
-    public async Task<ProductDTO> UpdateStatusOnProductAsync(int prodId)
-    {
-        var productStatusToChange = await _httpClient.GetFromJsonAsync<ProductDTO>($"api/products/status/{prodId}");
-        return await Task.FromResult(productStatusToChange);//TODO: ändra till Patch och se hur det fungerar
-
-    }
+    //public async Task<ProductDTO> UpdateStatusOnProductAsync(int id)
+    //{
+    //    var productStatusToChange = await _httpClient.PatchAsJsonAsync<ProductDTO>($"api/products/status/{id}");
+    //   await Task.FromResult(productStatusToChange);//TODO: ändra till Patch och se hur det fungerar
+    //   var x =await productStatusToChange.Content.ReadFromJsonAsync<ProductDTO>();
+    //   return x;
+    //}
 
     public async Task<ProductDTO> GetProductByNameAsync(string name)
     {
