@@ -19,7 +19,7 @@
             {
                 <option value="@customer.Id">@customer.FirstName @customer.LastName </option>
             }
-            
+
 
         </InputSelect>
         <button class="btn btn-success" type="submit">Go and BUY STUFF!</button>
@@ -115,7 +115,7 @@
 
     private async Task AddToCart(ProductDTO product)
     {
-       shoppingCustomer.Cart.Add(product);
+        shoppingCustomer.Cart.Add(product);
 
     }
 
@@ -129,12 +129,12 @@
         var shopping = whosShopping.FirstOrDefault(c => c.Id == selectedCustomer.Id);
 
         shoppingCustomer = new CustomerDTO
-        {
-            Id = shopping.Id,
-            FirstName = shopping.FirstName,
-            LastName = shopping.LastName,
-            Cart = new List<ProductDTO>()
-        };
+            {
+                Id = shopping.Id,
+                FirstName = shopping.FirstName,
+                LastName = shopping.LastName,
+                Cart = new List<ProductDTO>()
+            };
 
     }
 
@@ -148,20 +148,40 @@
 
         var shoppingId = shoppingCustomer.Id;
 
-        var order = new OrderDTO
+        var shoppingItems = shoppingCustomer.Cart;
+
+        var productsAndAmount = new List<ProductOrderDto>();
+
+        foreach (var product in shoppingItems)//Sortera i Cart för hur många producter och lägg till i Amount
         {
-            CustomerId = shoppingCustomer.Id,
-                ProductsAndAmount = 
-             
-            
-            TotalPrice = shoppingCustomer.Cart.Sum(p => p.Price)
-        };
+            var existingProduct = productsAndAmount.FirstOrDefault(p => p.ProductId == product.Id);
 
-        await orderService.CreateCustomerOrderAsync(shoppingId,order);
+            if (existingProduct != null)
+            {
+                existingProduct.Amount++;
+            }
+            else
+            {
+                productsAndAmount.Add(new ProductOrderDto
+                    {
+                        ProductId = product.Id,
+                        Amount = 1
+                    });
+            }
+        }
 
 
+        var CustomerOrder = new OrderDTO
+            {
+                CustomerId = shoppingId,
+                OrderDate = DateTime.Now,
+                ProductsInShoppingcart = shoppingItems,
+                ProductsAndAmount = productsAndAmount,
+                TotalPrice = shoppingItems.Sum(p => p.Price)
+            };
 
-
+        await orderService.CreateCustomerOrderAsync(shoppingId, CustomerOrder);
+        
 
 
     }

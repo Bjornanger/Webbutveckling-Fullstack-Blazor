@@ -3,103 +3,105 @@
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs
 @using webbutveckling_labb2_Bjornanger.Shared.Interfaces
+@using BootstrapBlazor.Components
 @inject IOrderService<OrderDTO> orderService
 @inject ICustomerService<CustomerDTO> customerService
 @inject IProductService<ProductDTO> productService
 
 @rendermode InteractiveServer
 <h3>Customers Orders</h3>
-<div class="bg-danger" >
+<div class="bg-danger">
 
 
-<div class="container">
-    <div class="row">
-        <label>Select Customer:</label>
-        <EditForm Model="customerToShow" FormName="SearchCustomerOrder" OnValidSubmit="LoadCustomer">
-            <InputSelect class="form-select" id="chooseCustomer" @bind-Value="customerToShow">
-            
-            <option value="">Select customer...</option>
-            @foreach (var customer in customerList)
-            {
-                <option value="@customer">@customer.FirstName @customer.LastName</option>
-            }
+    <div class="container">
+        <div class="row">
+            <label>Select Customer:</label>
+            <EditForm Model="customerToShow" FormName="SearchCustomerOrder" OnValidSubmit="LoadCustomer">
+                <InputSelect class="form-select" id="chooseCustomer" @bind-Value="customerToShow.Id">
+
+                    <option value="">Select customer...</option>
+                    @foreach (var customer in customerList)
+                    {
+                        <option value="@customer.Id">@customer.FirstName @customer.LastName</option>
+                    }
                 </InputSelect>
-        </EditForm>
-        
+                <button type="submit" class="btn btn-success">Load Customer></button>
+            </EditForm>
+
+        </div>
+
+        <div>
+            @if (customerToShow.Id != null)
+            {
+                <h3>Orders for @customerToShow.FirstName , @customerToShow.LastName</h3>
+                <ul class="list-group">
+                    @foreach (var order in customerToShow.Orders)
+                    {
+                        <li class="list-group-item">
+                            Order ID: @order.Id <br />
+                            Order Date: @order.OrderDate <br />
+                            Order Products: @order.ProductsInShoppingcart <br />
+                            Order Specifics: @order.ProductsAndAmount <br />
+                            Order Total: @order.TotalPrice <br />
+
+                        </li>
+
+                    }
+                </ul>
+            }
+        </div>
     </div>
     
-    <div>
-        @if (customerToShow != null)
-        {
-            <h3>Orders for @customerToShow.FirstName</h3>
-            <ul class="list-group">
-                @foreach (var order in customerToShow.Orders)
-                {
-                    <li class="list-group-item">
-                        Order ID: @order.Id <br />
-                        Order Date: @order.OrderDate <br />
-                        Order Products: @order.ProductsInOrder <br />
-                        Order Specifics: @order.ProductOrders <br />
-                        Order Total: @order.TotalPrice <br />
-                        
-                    </li>
-                }
+    
+    
 
-            </ul>
+    <div>
+        <h3>All Customers</h3>
+
+
+        @if (customerList.Count > 0)
+        {
+            <h3>Customers</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Firstname</th>
+                        <th>Lastname</th>
+                        <th>Email</th>
+                        <th>Password</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>City</th>
+                        <th>Region</th>
+                        <th>ZipCode</th>
+                        <th>Country</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+                    @foreach (var customer in customerList)
+                    {
+                        <tr>
+                            <td>@customer.FirstName</td>
+                            <td>@customer.LastName</td>
+                            <td>@customer.Email</td>
+                            <td>@customer.Password</td>
+                            <td>@customer.ContactInfo.Phone</td>
+                            <td>@customer.ContactInfo.Address</td>
+                            <td>@customer.ContactInfo.City</td>
+                            <td>@customer.ContactInfo.Region</td>
+                            <td>@customer.ContactInfo.ZipCode</td>
+                            <td>@customer.ContactInfo.Country</td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+
         }
     </div>
-
-
-
-</div>
-
-<div>
-    <h3>All Customers</h3>
-
-
-    @if (customerList.Count > 0)
-    {
-        <h3>Customers</h3>
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Firstname</th>
-                <th>Lastname</th>
-                <th>Email</th>
-                <th>Password</th>
-                <th>Phone</th>
-                <th>Address</th>
-                <th>City</th>
-                <th>Region</th>
-                <th>ZipCode</th>
-                <th>Country</th>
-            </tr>
-
-            </thead>
-
-            <tbody>
-            @foreach (var customer in customerList)
-            {
-                <tr>
-                    <td>@customer.FirstName</td>
-                    <td>@customer.LastName</td>
-                    <td>@customer.Email</td>
-                    <td>@customer.Password</td>
-                    <td>@customer.ContactInfo.Phone</td>
-                    <td>@customer.ContactInfo.Address</td>
-                    <td>@customer.ContactInfo.City</td>
-                    <td>@customer.ContactInfo.Region</td>
-                    <td>@customer.ContactInfo.ZipCode</td>
-                    <td>@customer.ContactInfo.Country</td>
-                </tr>
-            }
-            </tbody>
-
-        </table>
-
-
-    }
-</div>
 
 
 </div>
@@ -110,7 +112,7 @@
 
 
     private List<CustomerDTO> customerList = new List<CustomerDTO>();
-    
+
 
 
     protected override async Task OnInitializedAsync()
@@ -122,7 +124,37 @@
 
     private async Task LoadCustomer()
     {
-        
+        if (customerToShow.Id == null)
+        {
+            return;
+        }
+
+
+        var showOrder = await orderService.GetOrderFromCustomerAsync(customerToShow.Id);
+
+
+       customerToShow = new CustomerDTO
+       {
+           Id = customerToShow.Id,
+           FirstName = customerToShow.FirstName,
+           LastName = customerToShow.LastName,
+           Email = customerToShow.Email,
+           Password = customerToShow.Password,
+                ContactInfo = new ContactInfoDTO
+                {
+                    Id = 0,
+                    Phone = customerToShow.ContactInfo.Phone,
+                    Address = customerToShow.ContactInfo.Address,
+                    ZipCode = customerToShow.ContactInfo.ZipCode,
+                    City = customerToShow.ContactInfo.City,
+                    Region = customerToShow.ContactInfo.Region,
+                    Country = customerToShow.ContactInfo.Country
+                },
+                Orders = showOrder.ToList()
+       };
+
+       
+
     }
 
 }

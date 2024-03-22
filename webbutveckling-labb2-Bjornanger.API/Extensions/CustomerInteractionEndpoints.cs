@@ -12,7 +12,7 @@ public static class CustomerInteractionEndpoints
     {
         var group = app.MapGroup("api/customer");
 
-        group.MapGet("/order/{Id}", GetOrderFromCustomer);
+        group.MapGet("/order/{id}", GetOrderFromCustomer);
         group.MapPost("/{Id}", CreateCustomerOrder);
         group.MapPut("/{id}", UpdateCustomerInfo);
         group.MapPatch("/password/{userId}/{newPassword}", UpdateCustomerPassword);
@@ -21,21 +21,24 @@ public static class CustomerInteractionEndpoints
     }
 
    
-private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> orderRepo,ICustomerService<Customer> customerRepo, int userId)
+private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> orderRepo,ICustomerService<Customer> customerRepo, int id)
     {
        
-        var customerOrderToGet = await customerRepo.GetByIdAsync(userId);
+        var customerOrderToGet = await customerRepo.GetByIdAsync(id);
         var customerOrders = customerOrderToGet.Orders.ToList();
         if (customerOrders is null)
         {
             return Results.NotFound("No orders found for this customer");
         }
 
+
+
+
         return Results.Ok(customerOrders);
     }
     
     private static async Task<IResult> CreateCustomerOrder(IProductService<Product> prodRepo,
-        ICustomerService<Customer> customerRepo,IOrderService<Order> orderRepo, OrderDTO request)
+        ICustomerService<Customer> customerRepo,IOrderService<Order> orderRepo, OrderDTO request) 
     {
         var customer = await customerRepo.GetByIdAsync(request.CustomerId);
         if (customer is null)
@@ -44,7 +47,7 @@ private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> ord
         }
 
         var products = new List<ProductsOrders>();
-        foreach (var productOrder in request.ProductOrders)
+        foreach (var productOrder in request.ProductsAndAmount)
         {
             var product = await prodRepo.GetByIdAsync(productOrder.ProductId);
             if (product is null)
