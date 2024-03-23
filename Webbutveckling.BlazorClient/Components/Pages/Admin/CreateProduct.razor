@@ -3,7 +3,6 @@
 @using webbutveckling_labb2_Bjornanger.Shared.Interfaces
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs
-@using System.Text.Json
 @inject IProductService<ProductDTO> adminService
 @inject ICategoryService<CategoryDTO> adminCategory
 @inject IWebHostEnvironment env
@@ -188,26 +187,26 @@
 
         try
         {
-            // Generate a unique filename
+            // Skapar ett unikt namn på filen
             string newFileName = Path.ChangeExtension(
                 Path.GetRandomFileName(),
                 Path.GetExtension(file.Name));
 
-            // Construct the absolute path where the file will be stored
+            // Skapar vägen till wwwroot så de ligger i Client istället för API
             string absolutePath = Path.Combine(
                 env.WebRootPath,
                 "images",
                 newFileName);
 
-            // Construct the relative path
+            
             string relativePath = Path.Combine(
                 "images",
                 newFileName);
 
-            // Ensure the directory exists
+           
             Directory.CreateDirectory(Path.GetDirectoryName(absolutePath));
 
-            // Save the file
+            //Sparar filen
             await using FileStream fs = new(absolutePath, FileMode.Create);
             await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
 

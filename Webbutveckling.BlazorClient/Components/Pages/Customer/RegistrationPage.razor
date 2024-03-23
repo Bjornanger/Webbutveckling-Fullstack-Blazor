@@ -2,7 +2,6 @@
 @using webbutveckling_labb2_Bjornanger.Shared.Interfaces
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs
 @inject ICustomerService<CustomerDTO> customerService
-@* @inject IContactInfoService<ContactInfoDTO> contactInfoService *@
 @inject IJSRuntime JSRuntime
 
 
@@ -26,43 +25,43 @@
             <ValidationSummary />
 
             <div>
-                <label for="firstName">First Name</label>
+                <label>First Name</label>
                 <InputText id="firstName" class="form-control" @bind-Value="newCustomerToAdd.FirstName" placeholder="Enter Firstname"></InputText>
             </div>
             <div>
-                <label for="lastName">Last Name</label>
+                <label>Last Name</label>
                 <InputText id="lastName" class="form-control" @bind-Value="newCustomerToAdd.LastName" placeholder="Enter Lastname"></InputText>
             </div>
             <div>
-                <label for="email">Email</label>
+                <label>Email</label>
                 <InputText id="email" class="form-control" @bind-Value="newCustomerToAdd.Email" placeholder="Enter Email"></InputText>
             </div>
             <div>
-                <label for="password">Password</label>
+                <label>Password</label>
                 <InputText id="password" class="form-control" @bind-Value="newCustomerToAdd.Password" placeholder="Enter Password"></InputText>
             </div>
             <div>
-                <label for="phoneNumber">Phone Number</label>
+                <label>Phone Number</label>
                 <InputText id="phoneNumber" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Phone" placeholder="Enter Phone Number"></InputText>
             </div>
             <div>
-                <label for="address">Address</label>
+                <label>Address</label>
                 <InputText id="address" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Address" placeholder="Enter Address"></InputText>
             </div>
             <div>
-                <label for="zipCode">Zip Code</label>
+                <label>Zip Code</label>
                 <InputText id="zipCode" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.ZipCode" placeholder="Enter Zip Code"></InputText>
             </div>
             <div>
-                <label for="city">City</label>
+                <label>City</label>
                 <InputText id="city" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.City" placeholder="Enter City"></InputText>
             </div>
             <div>
-                <label for="Region">Region</label>
-                <InputText id="zipCode" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Region" placeholder="Enter Region"></InputText>
+                <label>Region</label>
+                <InputText id="Region" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Region" placeholder="Enter Region"></InputText>
             </div>
             <div>
-                <label for="country">Country</label>
+                <label>Country</label>
                 <InputText id="country" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Country" placeholder="Enter Country"></InputText>
             </div>
             <button type="submit" color="primary">Create</button>

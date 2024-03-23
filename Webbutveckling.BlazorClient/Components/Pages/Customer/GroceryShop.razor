@@ -3,7 +3,6 @@
 @using webbutveckling_labb2_Bjornanger.Shared.Interfaces
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs
-@using BootstrapBlazor.Components
 @inject IProductService<ProductDTO> productService
 @inject ICategoryService<CategoryDTO> categoryService
 @inject IOrderService<OrderDTO> orderService
@@ -36,7 +35,6 @@
             <h2>Products</h2>
             @foreach (var product in productsInStore)
             {
-
                 var category = categoryInShop.FirstOrDefault(c => c.Id == product.Category);
                 <div class="col-md-4">
                     <img class="card-img-top" src="@product.ImageUrl" alt="Product Image">
@@ -51,11 +49,7 @@
             }
         </div>
     </div>
-
-
- 
     
-
     <hr>
 
     <h2>Shopping Cart</h2>

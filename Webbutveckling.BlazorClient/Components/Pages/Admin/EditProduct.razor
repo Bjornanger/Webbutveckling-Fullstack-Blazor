@@ -2,7 +2,6 @@
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs
 @using webbutveckling_labb2_Bjornanger.Shared.Interfaces
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs
-@using BootstrapBlazor.Components
 @inject IProductService<ProductDTO> adminService
 @inject ICategoryService<CategoryDTO> adminCategory
 @inject IJSRuntime JSRuntime
@@ -85,13 +84,12 @@
                     </InputSelect>
                     <br />
                     <button type="button" class="btn btn-outline-warning" @onclick="ChangeStatus">@statusLabel</button>
-                    <label class="form-check-label" for="availabilitySwitch">@statusLabel</label>
+                    <label class="form-check-label">@statusLabel</label>
                     <br />
                     <button class="btn btn-outline-success" type="submit">Update</button>
                 </EditForm>
 
-
-            </div>
+                </div>
         </div>
     </div>
 </div>
