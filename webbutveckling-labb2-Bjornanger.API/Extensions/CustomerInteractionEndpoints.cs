@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using webbutveckling_labb2_Bjornanger.Shared.DTOs;
+using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs;
 using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs;
 using webbutveckling_labb2_Bjornanger.Shared.Entities;
 using webbutveckling_labb2_Bjornanger.Shared.Interfaces;
@@ -24,16 +26,13 @@ public static class CustomerInteractionEndpoints
 private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> orderRepo,ICustomerService<Customer> customerRepo, int id)
     {
        
-        var customerOrderToGet = await customerRepo.GetByIdAsync(id);
-        var customerOrders = customerOrderToGet.Orders.ToList();
-        if (customerOrders is null)
+        var customerOrders = await orderRepo.GetOrderFromCustomerAsync(id);
+        
+        if (customerOrders is null || !customerOrders.Any())
         {
             return Results.NotFound("No orders found for this customer");
         }
-
-
-
-
+       
         return Results.Ok(customerOrders);
     }
     
@@ -47,7 +46,7 @@ private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> ord
         }
 
         var products = new List<ProductsOrders>();
-        foreach (var productOrder in request.ProductsAndAmount)
+        foreach (var productOrder in request.ProductOrders)
         {
             var product = await prodRepo.GetByIdAsync(productOrder.ProductId);
             if (product is null)
@@ -64,9 +63,12 @@ private static async Task<IResult> GetOrderFromCustomer(IOrderService<Order> ord
 
         var order = new Order
         {
-            Customer = customer,
+            CustomerId = customer.Id,
             ProductOrders = products,
-            OrderDate = DateTime.Now
+            OrderDate = DateTime.Now,
+            TotalPrice = products.Sum(p => p.Product.Price * p.Amount)
+
+            
         };
 
         await orderRepo.AddAsync(order);

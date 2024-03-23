@@ -36,7 +36,7 @@ public class AdminRepository : IAdminService<Admin>
     public async Task DeleteAsync(int id)
     {
         var adminToRemove =await _context.Admins.FindAsync(id);
-        _context.Admins.Remove(adminToRemove);
+        _context.Admins.Remove(adminToRemove ?? throw new InvalidOperationException());
        await _context.SaveChangesAsync();
     }
 }

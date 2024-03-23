@@ -14,7 +14,7 @@ public class OrderService : IOrderService<OrderDTO>
     }
 
 
-    public Task AddAsync(OrderDTO entity)//Gör en Endpoint till detta
+    public Task AddAsync(OrderDTO entity)
     {
         throw new NotImplementedException();
     }
@@ -25,11 +25,7 @@ public class OrderService : IOrderService<OrderDTO>
         return await Task.FromResult(orderFromCustomer);
 
     }
-
-    public async Task AddToProductOrdersAsync(ProductsOrders orders)
-    {
-        throw new NotImplementedException();
-    }
+    
 
     public async Task CreateCustomerOrderAsync(int id, OrderDTO entity)
     {

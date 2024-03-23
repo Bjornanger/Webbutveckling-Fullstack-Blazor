@@ -132,16 +132,13 @@ public class CustomerRepository : ICustomerService<Customer>
             .Include(c => c.Orders)
             .FirstOrDefaultAsync(c => c.Email == email);
     }
-
-    public async Task UpdateCustomerPasswordAsync(int id, string newPassword)//TODO kolla om detta fungerar
+    public async Task UpdateCustomerPasswordAsync(int id, string newPassword)
     {
         var customer = _context.Customers.FindAsync(id);
         var user = new User
         {
             Password = newPassword
         };
-
-
         
         _context.Users.Update(user);
         await _context.SaveChangesAsync();

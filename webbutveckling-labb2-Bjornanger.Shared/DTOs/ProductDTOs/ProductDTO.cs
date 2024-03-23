@@ -21,8 +21,8 @@ public class ProductDTO
     public int Category { get; set; } = 0;
 
 
-    [Range(typeof(bool), "true", "false", ErrorMessage = "Approval required.")]
-    public bool Status { get; set; } 
+    [Range(typeof(bool), "true", "true", ErrorMessage = "Approval required.")]
+    public bool Status { get; set; } = true;
 
     [Url] public string ImageUrl { get; set; } 
     public int Stock { get; set; }

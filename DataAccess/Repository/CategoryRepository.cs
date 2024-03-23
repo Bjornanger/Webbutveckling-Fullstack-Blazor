@@ -26,7 +26,7 @@ public class CategoryRepository : ICategoryService<Category>
        return _context.Categories;
     }
 
-    public async Task<Category?> GetByIdAsync(int id)
+    public async Task<Category> GetByIdAsync(int id)
     {
         var category = await _context.Categories.FindAsync(id);
         if (category is null)
@@ -46,7 +46,7 @@ public class CategoryRepository : ICategoryService<Category>
     public async Task DeleteAsync(int id)
     {
         var categoryToDelete = await _context.Categories.FindAsync(id);
-        _context.Categories.Remove(categoryToDelete);
+        if (categoryToDelete != null) _context.Categories.Remove(categoryToDelete);
         await _context.SaveChangesAsync();
     }
 }

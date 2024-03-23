@@ -1,4 +1,5 @@
-﻿using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs;
+﻿using System.Text.Json.Serialization;
+using webbutveckling_labb2_Bjornanger.Shared.DTOs.ProductDTOs;
 
 namespace webbutveckling_labb2_Bjornanger.Shared.DTOs;
 
@@ -13,7 +14,7 @@ public class OrderDTO
     public virtual List<ProductDTO> ProductsInShoppingcart { get; set; } = new List<ProductDTO>();
 
     
-    public List<ProductOrderDto> ProductsAndAmount { get; set; }
+    public List<ProductOrderDto> ProductOrders { get; set; }
 
   
 }

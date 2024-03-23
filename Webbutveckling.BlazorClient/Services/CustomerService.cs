@@ -17,7 +17,7 @@ public class CustomerService : ICustomerService<CustomerDTO>
         _httpClient = factory.CreateClient("BlazorAPI");
     }
 
-    public async Task<IEnumerable<CustomerDTO?>> GetAllAsync()
+    public async Task<IEnumerable<CustomerDTO>> GetAllAsync()
     {
        var allUsers = await _httpClient.GetFromJsonAsync<IEnumerable<CustomerDTO>>("api/users/customers");
        return await Task.FromResult(allUsers);

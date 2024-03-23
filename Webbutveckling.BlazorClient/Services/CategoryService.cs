@@ -14,7 +14,7 @@ public class CategoryService :ICategoryService<CategoryDTO>
     
 
 
-    public async Task<IEnumerable<CategoryDTO?>> GetAllAsync()
+    public async Task<IEnumerable<CategoryDTO>> GetAllAsync()
     {
         var allCategories = await _httpClient.GetFromJsonAsync<IEnumerable<CategoryDTO>>("api/categories");
         return await Task.FromResult(allCategories);

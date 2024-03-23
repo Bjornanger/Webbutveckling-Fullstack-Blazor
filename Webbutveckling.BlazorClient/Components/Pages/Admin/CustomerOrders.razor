@@ -7,139 +7,161 @@
 @inject IOrderService<OrderDTO> orderService
 @inject ICustomerService<CustomerDTO> customerService
 @inject IProductService<ProductDTO> productService
+@inject IJSRuntime JSRuntime
 
 @rendermode InteractiveServer
 <h3>Customers Orders</h3>
-<div class="bg-danger">
 
 
-    <div class="container">
-        <div class="row">
-            <label>Select Customer:</label>
-            <EditForm Model="customerToShow" FormName="SearchCustomerOrder" OnValidSubmit="LoadCustomer">
-                <InputSelect class="form-select" id="chooseCustomer" @bind-Value="customerToShow.Id">
 
-                    <option value="">Select customer...</option>
-                    @foreach (var customer in customerList)
-                    {
-                        <option value="@customer.Id">@customer.FirstName @customer.LastName</option>
-                    }
-                </InputSelect>
-                <button type="submit" class="btn btn-success">Load Customer></button>
-            </EditForm>
+<div class="container">
+    <div class="row">
+        <label>Select Customer:</label>
+        <EditForm Model="customerToShow" FormName="SearchCustomerOrder" OnValidSubmit="LoadCustomer">
+            <InputSelect class="form-select" id="chooseCustomer" @bind-Value="customerToShow.Id">
 
-        </div>
+                <option value="">Select customer...</option>
+                @foreach (var customer in customerList)
+                {
+                    <option value="@customer.Id">@customer.FirstName @customer.LastName</option>
+                }
+            </InputSelect>
+            <button type="submit" class="btn btn-success">Load Customer></button>
+        </EditForm>
 
-        <div>
-            @if (customerToShow.Id != null)
-            {
-                <h3>Orders for @customerToShow.FirstName , @customerToShow.LastName</h3>
-                <ul class="list-group">
+    </div>
+
+    <div>
+        @if (customerToShow.Id != null)
+        {
+            <h3>Orders for @customerToShow.FirstName @customerToShow.LastName</h3>
+            <ul class="list-group">
+                @if (customerToShow.Orders != null)
+                {
                     @foreach (var order in customerToShow.Orders)
                     {
                         <li class="list-group-item">
-                            Order ID: @order.Id <br />
-                            Order Date: @order.OrderDate <br />
-                            Order Products: @order.ProductsInShoppingcart <br />
-                            Order Specifics: @order.ProductsAndAmount <br />
-                            Order Total: @order.TotalPrice <br />
-
+                            Order ID: @order.Id <br/>
+                            Order Date: @order.OrderDate <br/>
+                            Order Total sum: $@order.TotalPrice <br/>
+                            <ul>
+                                @foreach (var productOrder in order.ProductOrders)
+                                {
+                                    var product = productList.FirstOrDefault(p => p.Id == productOrder.ProductId);
+                                    <li>
+                                        Product ID: @productOrder.ProductId <br/>
+                                        Product Name: @(productOrder.ProductName = product!.Name) <br/>
+                                        Amount: @productOrder.Amount
+                                    </li>
+                                }
+                            </ul>
                         </li>
-
                     }
-                </ul>
-            }
-        </div>
-    </div>
-    
-    
-    
-
-    <div>
-        <h3>All Customers</h3>
-
-
-        @if (customerList.Count > 0)
-        {
-            <h3>Customers</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Firstname</th>
-                        <th>Lastname</th>
-                        <th>Email</th>
-                        <th>Password</th>
-                        <th>Phone</th>
-                        <th>Address</th>
-                        <th>City</th>
-                        <th>Region</th>
-                        <th>ZipCode</th>
-                        <th>Country</th>
-                    </tr>
-
-                </thead>
-
-                <tbody>
-                    @foreach (var customer in customerList)
-                    {
-                        <tr>
-                            <td>@customer.FirstName</td>
-                            <td>@customer.LastName</td>
-                            <td>@customer.Email</td>
-                            <td>@customer.Password</td>
-                            <td>@customer.ContactInfo.Phone</td>
-                            <td>@customer.ContactInfo.Address</td>
-                            <td>@customer.ContactInfo.City</td>
-                            <td>@customer.ContactInfo.Region</td>
-                            <td>@customer.ContactInfo.ZipCode</td>
-                            <td>@customer.ContactInfo.Country</td>
-                        </tr>
-                    }
-                </tbody>
-
-            </table>
-
-
+                    
+                }
+            </ul>
         }
     </div>
-
-
 </div>
+
+
+
+
+<div>
+    <h3>All Customers</h3>
+
+
+    @if (customerList.Count > 0)
+    {
+        <h3>Customers</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Firstname</th>
+                    <th>Lastname</th>
+                    <th>Email</th>
+                    <th>Password</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>ZipCode</th>
+                    <th>City</th>
+                    <th>Region</th>
+                    <th>Country</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+                @foreach (var customer in customerList)
+                {
+                    <tr>
+                        <td>@customer.FirstName</td>
+                        <td>@customer.LastName</td>
+                        <td>@customer.Email</td>
+                        <td>@customer.Password</td>
+                        <td>@customer.ContactInfo.Phone</td>
+                        <td>@customer.ContactInfo.Address</td>
+                        <td>@customer.ContactInfo.ZipCode</td>
+                        <td>@customer.ContactInfo.City</td>
+                        <td>@customer.ContactInfo.Region</td>
+                        <td>@customer.ContactInfo.Country</td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+
+    }
+</div>
+
+
+
 @code {
 
     private CustomerDTO customerToShow { get; set; } = new();
-
-
-
     private List<CustomerDTO> customerList = new List<CustomerDTO>();
+    private List<CustomerDTO> customerListWithOrders = new List<CustomerDTO>();
+
+
+    private List<ProductDTO> productList = new List<ProductDTO>();
 
 
 
     protected override async Task OnInitializedAsync()
     {
         customerList.AddRange(await customerService.GetAllAsync());
+        productList.AddRange(await productService.GetAllAsync());
+        
 
     }
+
+   
+  
 
 
     private async Task LoadCustomer()
     {
-        if (customerToShow.Id == null)
+
+        var loadCustomer = customerList.FirstOrDefault(c => c.Id == customerToShow.Id);
+
+        if (loadCustomer is null)
         {
+            await ShowMessage("You have to choose a Customer to see Order history..");
             return;
         }
 
+        var showOrder = await orderService.GetOrderFromCustomerAsync(loadCustomer.Id);
+        
+     
 
-        var showOrder = await orderService.GetOrderFromCustomerAsync(customerToShow.Id);
-
-
-       customerToShow = new CustomerDTO
-       {
-           Id = customerToShow.Id,
-           FirstName = customerToShow.FirstName,
-           LastName = customerToShow.LastName,
-           Email = customerToShow.Email,
-           Password = customerToShow.Password,
+        customerToShow = new CustomerDTO
+            {
+                Id = customerToShow.Id,
+                FirstName = customerToShow.FirstName,
+                LastName = customerToShow.LastName,
+                Email = customerToShow.Email,
+                Password = customerToShow.Password,
                 ContactInfo = new ContactInfoDTO
                 {
                     Id = 0,
@@ -150,11 +172,27 @@
                     Region = customerToShow.ContactInfo.Region,
                     Country = customerToShow.ContactInfo.Country
                 },
-                Orders = showOrder.ToList()
-       };
+                Orders = showOrder.ToList().Select(order => new OrderDTO
+                {
+                    Id = order.Id,
+                    OrderDate = order.OrderDate,
+                    ProductOrders = order.ProductOrders,
+                    TotalPrice = order.TotalPrice
+                }).ToList()
 
-       
+
+
+
+            };
+
+
+
+
+
 
     }
-
+    private async Task ShowMessage(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", message);
+    }
 }

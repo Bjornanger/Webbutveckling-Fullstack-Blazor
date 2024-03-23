@@ -19,8 +19,7 @@ public static class ProductEndpointExtensions
 
         group.MapPost("/", AddProduct);
         group.MapPut("/{id}", UpdateProduct);
-        group.MapPatch("/status/{id}", UpdateStatusOnProduct);////<---PATCH 
-
+        group.MapPatch("/status/{id}", UpdateStatusOnProduct);
         group.MapDelete("/{id}", DeleteProduct);
 
         return app;
@@ -112,7 +111,7 @@ private static async Task<IResult> UpdateStatusOnProduct(IProductService<Product
             return null;
         }
         var prodToAdd = await repository.GetAllAsync();
-
+        
 
         if (prodToAdd is null)
         {
@@ -212,7 +211,7 @@ private static async Task<IResult> UpdateStatusOnProduct(IProductService<Product
         return prodToShowName;
     }
 
-    [SuppressMessage("ReSharper.DPA", "DPA0000: DPA issues")]
+  
     private static async Task<ProductDTO> GetProductById(IProductService<Product> repository, int id)
     {
 
@@ -242,7 +241,7 @@ private static async Task<IResult> UpdateStatusOnProduct(IProductService<Product
         return prodToFind;
     }
     
-    [SuppressMessage("ReSharper.DPA", "DPA0005: Database issues")]
+    
     private static async Task<List<ProductDTO>> GetAllProducts(IProductService<Product> repository)
     {
 

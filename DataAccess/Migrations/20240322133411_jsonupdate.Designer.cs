@@ -4,6 +4,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(GroceryStoreDbContext))]
-    partial class GroceryStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240322133411_jsonupdate")]
+    partial class jsonupdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -226,11 +229,13 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Order", b =>
                 {
-                    b.HasOne("webbutveckling_labb2_Bjornanger.Shared.Entities.Customer", null)
+                    b.HasOne("webbutveckling_labb2_Bjornanger.Shared.Entities.Customer", "Customer")
                         .WithMany("Orders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("webbutveckling_labb2_Bjornanger.Shared.Entities.Product", b =>

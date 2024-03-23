@@ -15,7 +15,6 @@ public static class UserEndpointExtensions
 
         group.MapGet("/customers", GetAllCustomers);
 
-        //TODO skapa en egen Admin-lista för att kunna söka och lägga till i.
         group.MapGet("/users/admin", GetAllAdmins);
         group.MapGet("/{userId:int}", GetUserById);
         group.MapGet("/{email}", GetUserByEmail);
@@ -86,11 +85,7 @@ public static class UserEndpointExtensions
            
         }
 
-        //User user = new User()
-        //{
-        //    Email = newCustomer.Login.Email,
-        //    Password = newCustomer.Login.Password
-        //};
+     
 
         Customer createNewCustomer = new Customer()
         {
@@ -142,8 +137,8 @@ public static class UserEndpointExtensions
                 Region = customerEmail.ContactInfo.Region,
                 Country = customerEmail.ContactInfo.Country
             },
-            Orders = null,
-            Cart = null
+            Orders = null!,
+            Cart = null!
         };
 
 
@@ -190,15 +185,14 @@ public static class UserEndpointExtensions
                     Phone = c.ContactInfo.Phone,
                     Address = c.ContactInfo.Address,
                     ZipCode = c.ContactInfo.ZipCode,
-                    City = c.ContactInfo.ZipCode,
+                    City = c.ContactInfo.City,
                     Region = c.ContactInfo.Region,
                     Country = c.ContactInfo.Country
                 },
-                Orders = null,
-                Cart = null
+                Orders = null!,
+                Cart = null!
             }).ToList();
-
-
+        
         Results.Ok("Customer do exist.");
         return customerList.ToList();
     }

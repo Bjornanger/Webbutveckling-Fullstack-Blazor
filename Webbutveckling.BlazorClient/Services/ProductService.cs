@@ -19,7 +19,7 @@ public class ProductService : IProductService<ProductDTO>
 
 
 
-    public async Task<IEnumerable<ProductDTO?>> GetAllAsync()
+    public async Task<IEnumerable<ProductDTO>> GetAllAsync()
     {
         var allProducts = await _httpClient.GetFromJsonAsync<IEnumerable<ProductDTO>>("api/products");
         return await Task.FromResult(allProducts);
@@ -33,15 +33,7 @@ public class ProductService : IProductService<ProductDTO>
         await _httpClient.PutAsJsonAsync($"api/products/{id}", entity);
         return await Task.FromResult(entity);
     }
-
-    //public async Task<ProductDTO> UpdateStatusOnProductAsync(int id)
-    //{
-    //    var productStatusToChange = await _httpClient.PatchAsJsonAsync<ProductDTO>($"api/products/status/{id}");
-    //   await Task.FromResult(productStatusToChange);//TODO: ändra till Patch och se hur det fungerar
-    //   var x =await productStatusToChange.Content.ReadFromJsonAsync<ProductDTO>();
-    //   return x;
-    //}
-
+    
     public async Task<ProductDTO> GetProductByNameAsync(string name)
     {
         var productToShow = await _httpClient.GetFromJsonAsync<ProductDTO>($"api/products/name/{name}");
@@ -53,7 +45,7 @@ public class ProductService : IProductService<ProductDTO>
         return await Task.FromResult(productToShow);
     }
 
-    public async Task AddAsync(ProductDTO product) //TODO: KOlla så att det läggs till en product i lista och Databas.
+    public async Task AddAsync(ProductDTO product) 
     {
         var response = await _httpClient.PostAsJsonAsync("api/products", product);
         if (!response.IsSuccessStatusCode)
@@ -62,7 +54,7 @@ public class ProductService : IProductService<ProductDTO>
         }
     }
 
-    public async Task DeleteAsync(int id)//TODO: Fixa så att det går att ta bort en produkt ur lista i Front och i databasen.
+    public async Task DeleteAsync(int id)
     {
         await _httpClient.DeleteAsync($"api/products/{id}");
     }

@@ -31,16 +31,13 @@ public class OrderRepository : IOrderService<Order>
         await _context.SaveChangesAsync();
     }
 
-    public Task<IEnumerable<Order>> GetOrderFromCustomerAsync(int id)
+    public async Task<IEnumerable<Order>> GetOrderFromCustomerAsync(int id)
     {
-        throw new NotImplementedException();
+       var order = _context.Orders.Include(o => o.ProductOrders)
+            .Where(o => o.CustomerId == id).ToList();
+       return order;
     }
-
-    public Task AddToProductOrdersAsync(ProductsOrders orders)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public async Task CreateCustomerOrderAsync(int id, Order entity)
     {
        var customerToAddOrderTo = await _context.Customers.FindAsync(id);
@@ -48,20 +45,15 @@ public class OrderRepository : IOrderService<Order>
        await _context.SaveChangesAsync();
     }
 
-    
 
     public async Task DeleteAsync(int id)
     {
         var orderToDelete = await _context.Orders.FindAsync(id);
-        _context.Orders.Remove(orderToDelete);
+        if (orderToDelete != null) _context.Orders.Remove(orderToDelete);
         await _context.SaveChangesAsync();
     }
 
 
 
-    public async Task AddToProductOrders(ProductsOrders orders)
-    {
-        await _context.ProductOrders.AddAsync(orders);
-        await _context.SaveChangesAsync();
-    }
+
 }

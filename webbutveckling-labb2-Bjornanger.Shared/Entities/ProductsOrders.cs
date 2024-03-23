@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace webbutveckling_labb2_Bjornanger.Shared.Entities;
 
@@ -11,6 +12,7 @@ public class ProductsOrders
 
     public Product Product { get; set; }
 
+    [JsonIgnore]
     public Order Order { get; set; }
     public int OrderId { get; set; }
     public int Amount { get; set; }

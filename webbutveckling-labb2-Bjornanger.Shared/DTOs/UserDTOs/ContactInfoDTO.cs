@@ -7,19 +7,19 @@ public class ContactInfoDTO
     public int Id { get; set; }
     [Required]
     [Phone]
-    public string Phone { get; set; }
+    public string Phone { get; set; } = null!;
 
     [Required]
-    public string Address { get; set; }
+    public string Address { get; set; } = null!;
 
     [Required]
-    public string ZipCode { get; set; }
+    public string ZipCode { get; set; } = null!;
 
     [Required]
-    public string City { get; set; }
-    public string Region { get; set; }
+    public string City { get; set; } = null!;
+    public string Region { get; set; } = null!;
     [Required]
 
-    public string Country { get; set; }
+    public string Country { get; set; } = null!;
 
 }

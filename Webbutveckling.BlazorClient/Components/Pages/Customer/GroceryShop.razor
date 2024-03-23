@@ -3,10 +3,12 @@
 @using webbutveckling_labb2_Bjornanger.Shared.Interfaces
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs
+@using BootstrapBlazor.Components
 @inject IProductService<ProductDTO> productService
 @inject ICategoryService<CategoryDTO> categoryService
 @inject IOrderService<OrderDTO> orderService
 @inject ICustomerService<CustomerDTO> customerService
+@inject IJSRuntime JSRuntime
 
 @rendermode InteractiveServer
 <h1>Grocery Store</h1>
@@ -28,62 +30,69 @@
 </div>
 
 
-<div class="container-sm">
-    <div class="row">
-        <div class="col-md-3">
+
+    <div class="container-sm">
+        <div class="row">
             <h2>Products</h2>
-            @foreach (var product in productsList)
+            @foreach (var product in productsInStore)
             {
-                <img class="card-img-top" src="@product.ImageUrl" alt="Product Image">
-                <div class="card-body">
-                    <h5 class="card-title">@product.Name</h5>
-                    <p class="card-text">Description: @product.Description</p>
-                    <p class="card-text">Price: @(product.Price) USD</p>
-                    <p class="card-text">Category: @product.Category</p>
-                    <button class="btn btn-success" @onclick="() => AddToCart(product)">Add to Cart</button>
+
+                var category = categoryInShop.FirstOrDefault(c => c.Id == product.Category);
+                <div class="col-md-4">
+                    <img class="card-img-top" src="@product.ImageUrl" alt="Product Image">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">Description: @product.Description</p>
+                        <p class="card-text">Price: @(product.Price) USD</p>
+                        <p class="card-text">Category: @category!.Name</p>
+                        <button class="btn btn-success" @onclick="() => AddToCart(product)">Add to Cart</button>
+                    </div>
                 </div>
             }
         </div>
     </div>
-</div>
 
 
+ 
+    
 
+    <hr>
 
-<hr>
-
-<h2>Shopping Cart</h2>
-<div class="row">
-    <div class="col-md-8">
-        <ul class="list-group">
-            @foreach (var item in shoppingCustomer.Cart)
-            {
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-md-6">@item.Name</div>
-                        <div class="col-md-3">$@item.Price</div>
-                        <div class="col-md-3">
-                            <button class="btn btn-danger btn-sm" @onclick="() => RemoveFromCart(item)">Remove</button>
+    <h2>Shopping Cart</h2>
+    <div class="row">
+        <div class="col-md-8">
+            <ul class="list-group">
+                @foreach (var product in shoppingCustomer.Cart)
+                {
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-6">@product.Name</div>
+                            <div class="col-md-3">$@product.Price</div>
+                            <div class="col-md-3">
+                                <button class="btn btn-danger btn-sm" @onclick="() => RemoveFromCart(product)">Remove</button>
+                            </div>
                         </div>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div>
+                        <p>@(shoppingCustomer.FirstName) @shoppingCustomer.LastName</p>
                     </div>
-                </li>
-            }
-        </ul>
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <div>
-                    <p>@(shoppingCustomer.FirstName)</p>
+                    <h5 class="card-title">Cart:</h5>
+                    <p class="card-text">Products: @shoppingCustomer.Cart.Count</p>
+                    <p class="card-text">Total Price:$@shoppingCustomer.Cart.Sum(p => p.Price)</p>
+                    <button class="btn btn-success" type="submit" @onclick="CreateOrder">Checkout</button>
                 </div>
-                <h5 class="card-title">Cart:</h5>
-                <p class="card-text">Products: @shoppingCustomer.Cart.Count</p>
-                <p class="card-text">Total Price: $</p>
-                <button class="btn btn-success" type="submit" @onclick="CreateOrder">Checkout</button>
             </div>
         </div>
     </div>
-</div>
+
+
+
 
 
 
@@ -96,37 +105,54 @@
     public List<CustomerDTO> whosShopping { get; set; } = new List<CustomerDTO>();
 
     public List<ProductDTO> productsList { get; set; } = new List<ProductDTO>();
-    public List<OrderDTO> orders { get; set; } = new List<OrderDTO>();
+    public List<ProductDTO> productsInStore { get; set; } = new List<ProductDTO>();
 
+    public List<OrderDTO> orders { get; set; } = new List<OrderDTO>();
+    public List<CategoryDTO> categoryInShop { get; set; } = new List<CategoryDTO>();
 
 
 
     protected async override Task OnInitializedAsync()
     {
         productsList.AddRange(await productService.GetAllAsync());
+        FilterProductsToShowInStore();
         whosShopping.AddRange(await customerService.GetAllAsync());
+        categoryInShop.AddRange(await categoryService.GetAllAsync());
     }
 
-
-    private async Task RemoveFromCart(ProductDTO item)
+    private void FilterProductsToShowInStore()
     {
-        shoppingCustomer.Cart.Remove(item);
+        productsInStore = productsList.Where(p => p.Status == true).ToList();
+    } 
+
+    private async Task RemoveFromCart(ProductDTO product)
+    {
+        shoppingCustomer.Cart.Remove(product);
     }
 
     private async Task AddToCart(ProductDTO product)
     {
+        var emptyProfil = whosShopping.Any(c => c.FirstName == shoppingCustomer.FirstName);
+
+        if (emptyProfil == false)
+        {
+            await ShowMessage($"You have to choose a Customer to shop with.");
+            return;
+        }
         shoppingCustomer.Cart.Add(product);
 
     }
 
     private async void SelectCustomer()
     {
-        if (selectedCustomer.Id == null)
+        var shopping = whosShopping.FirstOrDefault(c => c.Id == selectedCustomer.Id);
+
+        if (shopping is null)
         {
+            await ShowMessage("You have to choose a Customer to shop with.");
             return;
         }
 
-        var shopping = whosShopping.FirstOrDefault(c => c.Id == selectedCustomer.Id);
 
         shoppingCustomer = new CustomerDTO
             {
@@ -135,20 +161,26 @@
                 LastName = shopping.LastName,
                 Cart = new List<ProductDTO>()
             };
-
+        await ShowMessage($"Welcome {shoppingCustomer.FirstName} {shoppingCustomer.LastName}!");
     }
 
     private async Task CreateOrder()
     {
-        if (shoppingCustomer.Cart is null)
+        
+        var shoppingId = shoppingCustomer.Id;
+        if (shoppingId == null)
         {
+            await ShowMessage($"You have to choose a Customer to shop with.");
             return;
         }
 
-
-        var shoppingId = shoppingCustomer.Id;
-
         var shoppingItems = shoppingCustomer.Cart;
+
+        if(shoppingItems.Count == 0)
+        {
+            await ShowMessage("You have to add products to your cart before you can checkout.");
+            return;
+        }
 
         var productsAndAmount = new List<ProductOrderDto>();
 
@@ -176,14 +208,20 @@
                 CustomerId = shoppingId,
                 OrderDate = DateTime.Now,
                 ProductsInShoppingcart = shoppingItems,
-                ProductsAndAmount = productsAndAmount,
+                ProductOrders = productsAndAmount,
                 TotalPrice = shoppingItems.Sum(p => p.Price)
             };
 
         await orderService.CreateCustomerOrderAsync(shoppingId, CustomerOrder);
         
-
+        shoppingCustomer.Cart.Clear();
+        await ShowMessage($"Thank you {shoppingCustomer.FirstName} {shoppingCustomer.LastName} for shopping!");
 
     }
 
+
+    private async Task ShowMessage(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", message);
+    }
 }

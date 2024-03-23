@@ -5,6 +5,7 @@
 @using BootstrapBlazor.Components
 @inject IProductService<ProductDTO> adminService
 @inject ICategoryService<CategoryDTO> adminCategory
+@inject IJSRuntime JSRuntime
 
 @rendermode InteractiveServer
 
@@ -15,10 +16,12 @@
 
 <div class="container">
     <div class="row">
-        
+
         <div class="col-md-6">
             <h3>Search for Product</h3>
             <EditForm Model="productToFind" FormName="SearchForProd" OnValidSubmit="SearchProduct">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
                 <InputText type="text" @bind-Value="productToFind.Name" placeholder="Search..."></InputText>
                 <button class="btn btn-info" type="submit"><i class="fa fa-search"></i></button>
             </EditForm>
@@ -26,6 +29,8 @@
             <div class="row">
                 @foreach (var product in searchedProduct)
                 {
+                    var category = categoryToShow.FirstOrDefault(c => c.Id == product.Category);
+                    var statusText = product.Status ? "In Stock" : "Out of Stock";
                     <div class="col-md-4 mb-3">
                         <div class="card">
                             <img class="card-img-top" src="@product.ImageUrl" alt="Product Image">
@@ -34,17 +39,21 @@
                                 <p class="card-text">ID: @product.Id</p>
                                 <p class="card-text">Description: @product.Description</p>
                                 <p class="card-footer"> Price: @(product.Price) USD</p>
-                                <p class="card-footer"> Category: @product.Category</p>
+                                <p class="card-footer"> Category: @category.Name</p>
                                 <p class="card-footer">Stock: @product.Stock</p>
-                                <p class="card-footer">Available: @product.Status</p>
+                                <p class="card-footer">Available: @statusText</p>
+
+
                             </div>
                         </div>
                     </div>
                 }
+                <InputNumber @bind-Value="productToRemove.Id" placeholder="Enter Product ID to remove.." />
+                <button class="btn btn-danger" @onclick="RemoveProduct">Remove</button>
             </div>
         </div>
 
-       
+
         <div class="col-md-6">
             <h3>Update Product</h3>
 
@@ -52,10 +61,11 @@
                 <h5>Choose which field to update</h5>
                 <label>Search for product to Update</label>
                 <InputNumber @bind-Value="searchedId.Id" placeholder="Search by product Id.." />
+                
                 <button class="btn btn-primary" @onclick="SearchProductToUpdate">Search</button>
                 <EditForm Model="productToUpdate" FormName="UpdateProduct" OnValidSubmit="UpdateProduct">
                     <br />
-                    <label>ID on Product to change:</label><InputNumber id="prodId" @bind-Value="productToUpdate.Id" readonly />
+                    <label>ID on Product to change:</label><InputNumber id="prodId" @bind-Value="productToUpdate.Id" readonly/>
                     <label>New name for product:</label><InputText id="prodName" @bind-Value="productToUpdate.Name" placeholder="Update Name"></InputText>
                     <br />
                     <label>New description for product:</label><InputText id="prodDescription" @bind-Value="productToUpdate.Description" placeholder="Update Description"></InputText>
@@ -79,8 +89,8 @@
                     <br />
                     <button class="btn btn-outline-success" type="submit">Update</button>
                 </EditForm>
-               
-               
+
+
             </div>
         </div>
     </div>
@@ -95,13 +105,13 @@
 
 @code
 {
-    
+
     ProductDTO productToUpdate { get; set; } = new ProductDTO();
-    
+
     private bool isStatusAvailable = true;
     private string statusLabel => isStatusAvailable ? "Available" : "Out of Stock";
     ProductDTO searchedId { get; set; } = new ProductDTO();
-    
+
 
 
     ProductDTO productToFind { get; set; } = new ProductDTO();
@@ -123,12 +133,20 @@
 
     private async Task SearchProduct()
     {
-        if (string.IsNullOrEmpty(productToFind.Name))
+        if (productToFind is null)
         {
             return;
         }
 
-        var prodToSee = showAllProducts.Where(p => p.Name == productToFind.Name);
+
+
+        var prodToSee = showAllProducts.Where(p => p.Name.ToLower() == productToFind.Name.ToLower());
+        if (prodToSee is null)
+        {
+            await ShowMessage("Product with that name doesnt exist. Check your spelling.");
+            return;
+        }
+
 
         searchedProduct.AddRange(prodToSee);
     }
@@ -142,14 +160,11 @@
 
         var prodFromList = searchedProduct.FirstOrDefault(p => p.Id == productToRemove.Id);
 
-        if (prodFromList is null)
-        {
-            return;
-        }
 
+        await ShowMessage($"Product with Id: {prodFromList.Id} and Name: {prodFromList.Name} are deleted.");
         await adminService.DeleteAsync(prodFromList.Id);
-
-
+        
+        productToRemove = new ProductDTO();
         searchedProduct.Clear();
         showAllProducts.Clear();
         showAllProducts.AddRange(await adminService.GetAllAsync());
@@ -166,7 +181,7 @@
         {
             return;
         }
-       
+
 
         await adminService.UpdateAsync(productToUpdate, productToUpdate.Id);
 
@@ -177,16 +192,18 @@
 
     private async Task SearchProductToUpdate()
     {
-        if (searchedId == null)
+        bool noProd = showAllProducts.Any(p => p.Id != searchedId.Id);
+        if (noProd == true)
         {
+            await ShowMessage("Product with that Id doesnt exist.");
             return;
         }
 
-        
+
         var product = await adminService.GetByIdAsync(searchedId.Id);
 
         var updatedProduct = showAllProducts.FirstOrDefault(p => p.Id == product.Id);
-         productToUpdate = new ProductDTO
+        productToUpdate = new ProductDTO
             {
                 Id = updatedProduct.Id,
                 Name = updatedProduct.Name,
@@ -198,8 +215,8 @@
                 Status = updatedProduct.Status
 
             };
-            
-        
+
+
 
     }
 
@@ -207,11 +224,14 @@
     {
         productToUpdate.Status = !productToUpdate.Status;
         isStatusAvailable = !isStatusAvailable;
-        
-    }
-    
 
-    
+    }
+
+    private async Task ShowMessage(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", message);
+    }
+
 }
 
 

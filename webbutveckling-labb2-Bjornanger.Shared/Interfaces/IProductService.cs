@@ -6,9 +6,7 @@ public interface IProductService <T>: IService<T> where T : class
 {
      Task<T> UpdateAsync(T entity, int id);
     
-     //Task<T> UpdateStatusOnProductAsync(int prodId);
-
-    Task<T> GetProductByNameAsync(string name);
+     Task<T> GetProductByNameAsync(string name);
 
 
 }

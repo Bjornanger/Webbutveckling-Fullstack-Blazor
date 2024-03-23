@@ -11,7 +11,7 @@
 | "/products/name/{name}"         | GET    | string Name        | Product   | 200, 404      | Get product by name          |      
 | "/products/category/{category}" | GET    | string Category    | Product[] | 200, 404      | Get all products in category |      
 | "/products"                     | POST   | Product            | NONE      | 200, 400      | Add new product              |      
-| "/products/{id}"                | PATCH  | int Id, Product    | NONE      | 200, 400      | Update product               |      
+| "/products/{id}"                | PUT    | int Id, Product    | NONE      | 200, 400      | Update product               |      
 | "/products/status{id}"          | PATCH  | NONE               | NONE      | 200           | Toggle status on product     |   
 | "/products/{id}                 | DELETE | int Id             | NONE      | 200, 404      | Delete product               |      
 
@@ -41,7 +41,7 @@
 | ---------------------------------- | ------ | ------------------------------ | -------- | ------------- | --------------------------------- |
 | "/order/{userId}"                  | GET    | int userId                     | Order[]  | 200, 400      | Get all items from customer Order |
 | "/{userId}"                        | POST   | int userId                     | Order    | 200, 400      | Create a customer order           |
-| "/{userId}"                        | PATCH  | int userId, ContactInfo        | NONE     | 200, 404      | Update customer contactInfo       |
+| "/{userId}"                        | PUT    | int userId, ContactInfo        | NONE     | 200, 404      | Update customer contactInfo       |
 | "/password/{userId}/{newPassword}" | PATCH  | int userId, string newPassword | NONE     | 200, 404      | Update customer password          |
 
 
@@ -113,9 +113,9 @@
 | Phone         | string [attr] | Phone number of user         |
 | Address       | string [attr] | Street address of user       |
 | ZipCode       | string [attr] | Zip code of user             |
-| City          | string        | City of residence of user    |
-| Region        | string        | Region of residence of user  |
-| Country       | string        | Country of residence of user |
+| City          | string [attr] | City of residence of user    |
+| Region        | string [attr] | Region of residence of user  |
+| Country       | string [attr] | Country of residence of user |
 
 ### Order
 

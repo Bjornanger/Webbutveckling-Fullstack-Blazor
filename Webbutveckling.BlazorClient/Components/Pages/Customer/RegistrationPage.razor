@@ -2,137 +2,76 @@
 @using webbutveckling_labb2_Bjornanger.Shared.Interfaces
 @using webbutveckling_labb2_Bjornanger.Shared.DTOs.UserDTOs
 @inject ICustomerService<CustomerDTO> customerService
-@inject IContactInfoService<ContactInfoDTO> contactInfoService
+@* @inject IContactInfoService<ContactInfoDTO> contactInfoService *@
+@inject IJSRuntime JSRuntime
 
 
 @rendermode InteractiveServer
 
 <div class="container">
-    <Row>
+    <div class="row">
         <h3>Registration</h3>
         <p>
             Welcome! Please fill in all the fields below to create a new user account.
         </p>
-
-    </Row>
+    </div>
 </div>
 
 
 
- <Row>
-        <Col>
-            <EditForm Model="newCustomerToAdd" FormName="CreateCustomer" OnValidSubmit="CreateNewCustomer">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
+<div class="container">
+    <div class="row">
+        <EditForm Model="newCustomerToAdd" FormName="CreateCustomer" OnValidSubmit="CreateNewCustomer">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-                <Row>
-                    <Col md="6">
-                        <FormGroup>
-                            <Label for="firstName">First Name</Label>
-                            <InputText id="firstName" class="form-control" @bind-Value="newCustomerToAdd.FirstName" placeholder="Enter Firstname"></InputText>
-                        </FormGroup>
-                    <Col>
-                    <Col md="6">
-                        <FormGroup>
-                            <Label for="lastName">Last Name</Label>
-                            <InputText id="lastName" class="form-control" @bind-Value="newCustomerToAdd.LastName" placeholder="Enter Lastname"></InputText>
-                        </FormGroup>
-                    <Col>
-                </Row>
-
-                <Row>
-                    <Col md="6">
-                        <FormGroup>
-                            <Label for="email">Email</Label>
-                            <InputText id="email" class="form-control" @bind-Value="newCustomerToAdd.Email" placeholder="Enter Email"></InputText>
-                        </FormGroup>
-                    <Col>
-                    <Col md="6">
-                        <FormGroup>
-                            <Label for="password">Password</Label>
-                            <InputText id="password" class="form-control" @bind-Value="newCustomerToAdd.Password" placeholder="Enter Password"></InputText>
-                        </FormGroup>
-                    <Col>
-                </Row>
-
-                <Row>
-                    <Col md="6">
-                        <FormGroup>
-                            <Label for="phoneNumber">Phone Number</Label>
-                            <InputText id="phoneNumber" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Phone" placeholder="Enter Phone Number"></InputText>
-                        </FormGroup>
-                    <Col>
-                    <Col md="6">
-                        <FormGroup>
-                            <Label for="address">Address</Label>
-                            <InputText id="address" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Address" placeholder="Enter Address"></InputText>
-                        </FormGroup>
-                    <Col>
-                </Row>
-
-                <Row>
-                    <Col md="4">
-                        <FormGroup>
-                            <Label for="city">City</Label>
-                            <InputText id="city" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.City" placeholder="Enter City"></InputText>
-                        </FormGroup>
-                    <Col>
-                    <Col md="4">
-                    <FormGroup>
-                        <Label for="zipCode">Zip Code</Label>
-                        <InputText id="zipCode" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.ZipCode" placeholder="Enter Zip Code"></InputText>
-                    </FormGroup>
-                    <Col>
-                    <Col md="4">
-                    <FormGroup>
-                        <Label for="Region">Region</Label>
-                        <InputText id="zipCode" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Region" placeholder="Enter Region"></InputText>
-                    </FormGroup>
-                    <Col>
-                    <Col md="4">
-                        <FormGroup>
-                            <Label for="country">Country</Label>
-                            <InputText id="country" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Country" placeholder="Enter Country"></InputText>
-                        </FormGroup>
-                    <Col>
-                </Row>
-
-                <Row>
-                    <Col>
-                        <Button type="submit" color="primary">Create</Button>
-                    <Col>
-                </Row>
-            </EditForm>
-        <Col>
-    </Row>
+            <div>
+                <label for="firstName">First Name</label>
+                <InputText id="firstName" class="form-control" @bind-Value="newCustomerToAdd.FirstName" placeholder="Enter Firstname"></InputText>
+            </div>
+            <div>
+                <label for="lastName">Last Name</label>
+                <InputText id="lastName" class="form-control" @bind-Value="newCustomerToAdd.LastName" placeholder="Enter Lastname"></InputText>
+            </div>
+            <div>
+                <label for="email">Email</label>
+                <InputText id="email" class="form-control" @bind-Value="newCustomerToAdd.Email" placeholder="Enter Email"></InputText>
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <InputText id="password" class="form-control" @bind-Value="newCustomerToAdd.Password" placeholder="Enter Password"></InputText>
+            </div>
+            <div>
+                <label for="phoneNumber">Phone Number</label>
+                <InputText id="phoneNumber" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Phone" placeholder="Enter Phone Number"></InputText>
+            </div>
+            <div>
+                <label for="address">Address</label>
+                <InputText id="address" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Address" placeholder="Enter Address"></InputText>
+            </div>
+            <div>
+                <label for="zipCode">Zip Code</label>
+                <InputText id="zipCode" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.ZipCode" placeholder="Enter Zip Code"></InputText>
+            </div>
+            <div>
+                <label for="city">City</label>
+                <InputText id="city" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.City" placeholder="Enter City"></InputText>
+            </div>
+            <div>
+                <label for="Region">Region</label>
+                <InputText id="zipCode" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Region" placeholder="Enter Region"></InputText>
+            </div>
+            <div>
+                <label for="country">Country</label>
+                <InputText id="country" class="form-control" @bind-Value="newCustomerToAdd.ContactInfo.Country" placeholder="Enter Country"></InputText>
+            </div>
+            <button type="submit" color="primary">Create</button>
+        </EditForm>
+    </div>
+</div>
 
 
-<Container>
-    <Row>
-        <Col>
-        <h3>This is your profile:</h3>
-        <ul class="list-group">
-            @foreach (var customer in CreatedCustomer)
-            {
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-md-3">Name: @customer.FirstName</div>
-                        <div class="col-md-3">Lastname: @customer.LastName</div>
-                        <div class="col-md-3">Email: @customer.Email</div>
-                        <div class="col-md-3">Password: @customer.Password</div>
-                        <div class="col-md-3">Phone: @customer.ContactInfo.Phone</div>
-                        <div class="col-md-3">Address: @customer.ContactInfo.Address</div>
-                        <div class="col-md-3">Zipcode: @customer.ContactInfo.ZipCode</div>
-                        <div class="col-md-3">City: @customer.ContactInfo.City</div>
-                        <div class="col-md-3">Region: @customer.ContactInfo.Region</div>
-                        <div class="col-md-3">Country: @customer.ContactInfo.Country</div>
-                    </div>
-                </li>
-            }
-        </ul>
-        
-    </Row>
-</Container>
+
 
 
 
@@ -141,9 +80,8 @@
 
 @code {
 
-    private CustomerDTO newCustomerToAdd { get; set; } = new ();
-    private List<CustomerDTO> CreatedCustomer { get; set; } = new();
 
+    private CustomerDTO newCustomerToAdd { get; set; } = new();
 
 
     protected override async Task OnInitializedAsync()
@@ -182,9 +120,13 @@
             };
 
         await customerService.AddAsync(createNewCustomer);
-        CreatedCustomer.Add(createNewCustomer);
+        await ShowMessage("Profile Created Successfully!");
+        newCustomerToAdd = new CustomerDTO();
 
-
+    }
+    private async Task ShowMessage(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("alert", message);
     }
 
 } 

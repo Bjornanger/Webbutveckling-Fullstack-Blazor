@@ -2,7 +2,7 @@
 using webbutveckling_labb2_Bjornanger.Shared.Entities;
 
 namespace DataAccess;
-//TODO: Kolla så att alla kopplinar används
+
 public class GroceryStoreDbContext :DbContext
 {
     public DbSet<Admin> Admins { get; set; }
