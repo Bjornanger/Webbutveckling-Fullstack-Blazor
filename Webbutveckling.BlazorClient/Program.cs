@@ -17,9 +17,9 @@ builder.Services.AddHttpClient("BlazorAPI",
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddScoped<IProductService<ProductDTO>, ProductService>();//Endast för att hantera produkterna i affären
+builder.Services.AddScoped<IProductService<ProductDTO>, ProductService>();
 
-builder.Services.AddScoped<ICategoryService<CategoryDTO>, CategoryService>();//Endast för att hantera kategorier i affären
+builder.Services.AddScoped<ICategoryService<CategoryDTO>, CategoryService>();
 
 builder.Services.AddScoped<ICustomerService<CustomerDTO>, CustomerService>();
 
