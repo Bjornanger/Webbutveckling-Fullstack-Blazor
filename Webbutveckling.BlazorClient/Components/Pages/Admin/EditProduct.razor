@@ -64,7 +64,7 @@
                 <button class="btn btn-primary" @onclick="SearchProductToUpdate">Search</button>
                 <EditForm Model="productToUpdate" FormName="UpdateProduct" OnValidSubmit="UpdateProduct">
                     <br />
-                    <label>ID on Product to change:</label><InputNumber id="prodId" @bind-Value="productToUpdate.Id" readonly/>
+                     <label>ID on Product to change:</label><InputNumber id="prodId" @bind-Value="productToUpdate.Id" readonly/>
                     <label>New name for product:</label><InputText id="prodName" @bind-Value="productToUpdate.Name" placeholder="Update Name"></InputText>
                     <br />
                     <label>New description for product:</label><InputText id="prodDescription" @bind-Value="productToUpdate.Description" placeholder="Update Description"></InputText>

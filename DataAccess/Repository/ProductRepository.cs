@@ -40,7 +40,8 @@ public class ProductRepository : IProductService<Product>
 
     public async Task<Product> UpdateAsync(Product prod, int id)
     {
-        var prodToUpdate = await _context.Products.Include(p => p.Category)
+        var prodToUpdate = await _context.Products
+            .Include(p => p.Category)
             .FirstOrDefaultAsync(p => p.Id == prod.Id);
        if (prodToUpdate is null)
        {

@@ -16,6 +16,7 @@ public class ContactInfo
     public string Address { get; set; } 
 
     [Required]
+
     public string ZipCode { get; set; } 
 
     [Required]
